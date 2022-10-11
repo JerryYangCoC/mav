@@ -12,7 +12,7 @@
 
     <transition name="touch">
       <!-- touch button -->
-      <div class="btn-touch" v-show="touchView">
+      <div class="btn-touch neon-effect" v-show="touchView">
         <img src="/img/img_touch.png" @click="onStart">
       </div>
     </transition>
@@ -38,7 +38,7 @@
         <span>{{ data?.[dataIndex || 0]?.Product_Name }}</span>
       </div>
       <div class="banner-bar" v-if="!viewPage">
-        <template v-for="(item, index) in data" :key="item.Product_Name">
+        <template v-for="(item, index) in data" :key="index">
           <div class="f-28" @click="onGoDeatil(index)" v-if="index != dataIndex">
             {{ item?.Product_Name }}
           </div>
@@ -52,19 +52,19 @@
         </div>
         <div>
           <span>
-            <input type="checkbox" value="R零售" v-model="isApplication">
+            <input type="checkbox" value="R零售" v-model="isApplication" disabled >
             零售
           </span>
           <span>
-            <input type="checkbox" value="T移動" v-model="isApplication">
+            <input type="checkbox" value="T移動" v-model="isApplication" disabled >
             移動
           </span>
           <span>
-            <input type="checkbox" value="H醫療" v-model="isApplication">
+            <input type="checkbox" value="H醫療" v-model="isApplication" disabled >
             醫療
           </span>
           <span>
-            <input type="checkbox" value="E育樂" v-model="isApplication">
+            <input type="checkbox" value="E育樂" v-model="isApplication" disabled >
             育樂
           </span>
         </div>
@@ -92,7 +92,7 @@
         </div>
 
         <div class="row-3" v-if="data">
-          <template v-for="(item, index) in data" :key="item.Product_Name">
+          <template v-for="(item, index) in data" :key="index">
             <div @click="onGoDeatil(index)" v-if="index != 0">
               <img :src="'/img/' + item?.Partner + '/' + changeString(item?.Product_Name) + '-灰.png'">
             </div>
@@ -161,6 +161,7 @@ export default class HomeView extends Vue {
    * 取得推薦結果
    */
   getData(): void {
+    /// 192.168.50.234:8000
     axios.get('http://localhost/api/detection/recommend')
       .then((res) => {
         console.log('recommend', res)
@@ -226,7 +227,7 @@ export default class HomeView extends Vue {
    * @param data_age 用戶年齡
    * @param data_gender 用戶性別
    */
-  changePeopleTitle(data_age: number, data_gender: string) {
+  changePeopleTitle(data_age: number, data_gender: string): void {
     if(data_age < 26) {
       this.peopleTitle = data_gender == 'female' ? '少女' : '少年'
     } else if (data_age < 36) {
@@ -482,6 +483,15 @@ export default class HomeView extends Vue {
   .touch-leave-to {
     opacity: 0;
   }
+  .neon-effect {
+    animation:neon-shine 2s linear infinite;
+  }
+
+  @keyframes neon-shine{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.2);}
+    100%{transform:scale(1);}
+  }  
 // #endregion
 
 
