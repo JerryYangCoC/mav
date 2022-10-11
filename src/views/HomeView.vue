@@ -38,9 +38,11 @@
         <span>{{ data?.[dataIndex || 0]?.Product_Name }}</span>
       </div>
       <div class="banner-bar" v-if="!viewPage">
-        <div class="f-28" v-for="item in getBannerData()" :key="item.Product_Name">
-          {{ item?.Product_Name }}
-        </div>
+        <template v-for="(item, index) in data" :key="item.Product_Name">
+          <div class="f-28" @click="onGoDeatil(index)" v-if="index != dataIndex">
+            {{ item?.Product_Name }}
+          </div>
+        </template>
       </div>
 
       <div class="info" v-if="viewPage">
@@ -90,15 +92,11 @@
         </div>
 
         <div class="row-3" v-if="data">
-          <div @click="onGoDeatil(1)">
-            <img :src="'/img/' + data?.[1]?.Partner + '/' + changeString(data?.[1]?.Product_Name) + '-灰.png'">
-          </div>
-          <div @click="onGoDeatil(2)">
-            <img :src="'/img/' + data?.[2]?.Partner + '/' + changeString(data?.[2]?.Product_Name) + '-灰.png'">
-          </div>
-          <div @click="onGoDeatil(3)">
-            <img :src="'/img/' + data?.[3]?.Partner + '/' + changeString(data?.[3]?.Product_Name) + '-灰.png'">
-          </div>
+          <template v-for="(item, index) in data" :key="item.Product_Name">
+            <div @click="onGoDeatil(index)" v-if="index != 0">
+              <img :src="'/img/' + item?.Partner + '/' + changeString(item?.Product_Name) + '-灰.png'">
+            </div>
+          </template>
         </div>
       </div>
 
@@ -106,7 +104,7 @@
       <!-- 第三層資料 -->
       <div class="item-map m-t-30" v-else>
         <div>
-          <span class="f-32">展品介紹</span>
+          <span class="f-32">展品區域</span>
         </div>
         <div class="m-t-30">
           <img :src="'/img/' + data?.[dataIndex || 0]?.Partner + '/map.png'">
@@ -133,7 +131,7 @@ export default class HomeView extends Vue {
   doorView: boolean | null = true;
   touchView: boolean | null = true;
   isApplication: Array<string> | undefined = []
-  companyName: string | null = '業成集團X英特盛科技';
+  companyName: string | null = '';
   itemName: string | null = '';
   viewPage: boolean | null = null;
   peopleTitle: string | null = ''
@@ -157,16 +155,13 @@ export default class HomeView extends Vue {
     setTimeout(() => {
       this.doorView = false;
     }, 200)
-    setTimeout(() => {
-      this.viewPage = true;
-    }, 1200)
   }
 
   /**
    * 取得推薦結果
    */
   getData(): void {
-    axios.get('http://192.168.50.234:8000/api/detection/recommend')
+    axios.get('http://localhost/api/detection/recommend')
       .then((res) => {
         console.log('recommend', res)
         // this.isApplication = []
@@ -178,9 +173,16 @@ export default class HomeView extends Vue {
         this.data.push(res?.data?.Others[1])
         this.data.push(res?.data?.Others[2])
         this.data.push(res?.data?.Others[3])
+        this.changePeopleTitle(res?.data?.age, res?.data?.gender)
 
+        setTimeout(() => {
+          this.viewPage = true;
+        }, 500)
       }).catch((err) => {
         console.log(err)
+        this.doorView = true;
+        this.touchView = true;
+        this.viewPage = null;
       })
   }
 
@@ -198,7 +200,7 @@ export default class HomeView extends Vue {
    * @param i 產品于陣列位置
    */
   onGoDeatil(i: number): void {
-    console.log('go to detail')
+    // console.log('go to detail ', i)
     this.dataIndex = i
     this.viewPage = false
   }
@@ -207,7 +209,7 @@ export default class HomeView extends Vue {
    * 前往頁
    */
   onGoTo(): void {
-    console.log('go to')
+    // console.log('go to')
     switch(this.viewPage) {
       case true:
         this.onGoHome()
@@ -248,11 +250,6 @@ export default class HomeView extends Vue {
     return data.replace(/\n/g, "<br>") 
   }
 
-  getBannerData(): any {
-    return this.data.filter((item: any, i: number) => {
-      if (i != this.dataIndex) return item
-    })
-  }
 }
 </script>
 
@@ -379,12 +376,13 @@ export default class HomeView extends Vue {
   .banner-bar {
     display: flex;
     column-gap: 3px;
-    // background-color: white;
     height: 60px;
+    background-color: white;
 
     div {
       flex: 33%;
-      background-color: rgba(white, 20%);
+      // background-color: rgba($color: white, $alpha: .2);
+      background-color: rgb(81 96 107);
       padding: 8px 16px;
       line-height: 44px;
       text-overflow: ellipsis;
