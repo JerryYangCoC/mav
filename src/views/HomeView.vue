@@ -382,7 +382,7 @@ export default class HomeView extends Vue {
     div {
       flex: 33%;
       // background-color: rgba($color: white, $alpha: .2);
-      background-color: rgb(81 96 107);
+      background-color: #4D5E6A;
       padding: 8px 16px;
       line-height: 44px;
       text-overflow: ellipsis;
