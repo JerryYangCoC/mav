@@ -28,15 +28,20 @@
           SDIA智慧顯示創新應用館
         </span>
         <span v-else>
-          業成集團X英特盛科技
+          {{ data?.[dataIndex || 0]?.Partner }}
         </span>
       </div>
 
-      <div class="big-image m-t-30" :style="'--i:url(\'/img/' + data?.[dataIndex || 0]?.Partner + '/' + changeString(data?.[dataIndex || 0]?.Product_Name) + '-大.png'" v-if="!viewPage">
-        <span>120"透明多曲面互動LED顯示器</span>
-      </div>
 
-      
+      <!-- 第一層資料 -->
+      <div class="big-image m-t-30" :style="'--i:url(\'/img/' + data?.[dataIndex || 0]?.Partner + '/' + changeString(data?.[dataIndex || 0]?.Product_Name) + '-大.png'" v-if="!viewPage">
+        <span>{{ data?.[dataIndex || 0]?.Product_Name }}</span>
+      </div>
+      <div class="banner-bar" v-if="!viewPage">
+        <div class="f-28" v-for="item in getBannerData()" :key="item.Product_Name">
+          {{ item?.Product_Name }}
+        </div>
+      </div>
 
       <div class="info" v-if="viewPage">
         <!-- 資訊 -->
@@ -66,14 +71,14 @@
         </div>
       </div>
 
+
+      <!-- 第二層資料 -->
       <div class="item-info m-t-30" v-else>
         <div class="">
           <span class="f-32">展品介紹</span>
         </div>
         <div class="m-t-30">
-          <span class="f-24">1. 運用透明LED薄膜顯示技術，具備可撓曲、高亮度、高穿透、可拼接的特性。<br>
-2. 結合自行開發的模組化驅動系統與肢體偵測，展示全球第一個120" 透明多曲面互動顯示器。<br>
-3. 可作為在智慧移動交通站體之交通資訊與廣告、公共顯示…等應用的新興選項。</span>
+          <span class="f-24" v-html="changeBr(data?.[dataIndex || 0]?.Product_Description)"></span>
         </div>
       </div>
 
@@ -88,22 +93,24 @@
           <div @click="onGoDeatil(1)">
             <img :src="'/img/' + data?.[1]?.Partner + '/' + changeString(data?.[1]?.Product_Name) + '-灰.png'">
           </div>
-          <div></div>
           <div @click="onGoDeatil(2)">
             <img :src="'/img/' + data?.[2]?.Partner + '/' + changeString(data?.[2]?.Product_Name) + '-灰.png'">
           </div>
-          <div></div>
           <div @click="onGoDeatil(3)">
             <img :src="'/img/' + data?.[3]?.Partner + '/' + changeString(data?.[3]?.Product_Name) + '-灰.png'">
           </div>
         </div>
       </div>
 
+
+      <!-- 第三層資料 -->
       <div class="item-map m-t-30" v-else>
-        <div class="">
+        <div>
           <span class="f-32">展品介紹</span>
         </div>
-        <div></div>
+        <div class="m-t-30">
+          <img :src="'/img/' + data?.[dataIndex || 0]?.Partner + '/map.png'">
+        </div>
       </div>
 
       <div class="footer-box" @click="onGoTo()">
@@ -130,14 +137,20 @@ export default class HomeView extends Vue {
   itemName: string | null = '';
   viewPage: boolean | null = null;
   peopleTitle: string | null = ''
-  data: any | null = null;
+  data!: any;
   dataIndex: number | undefined = 0;
   
+  /**
+   * 初始化
+   */
   created(): void {
     this.doorView = true;
     this.touchView = true;    
   }
 
+  /**
+   * 點擊開始
+   */
   onStart(): void {
     this.touchView = false;
     this.getData();
@@ -149,6 +162,9 @@ export default class HomeView extends Vue {
     }, 1200)
   }
 
+  /**
+   * 取得推薦結果
+   */
   getData(): void {
     axios.get('http://192.168.50.234:8000/api/detection/recommend')
       .then((res) => {
@@ -168,18 +184,28 @@ export default class HomeView extends Vue {
       })
   }
 
+  /**
+   * 回主頁
+   */
   onGoHome(): void {
     this.doorView = true;
     this.touchView = true;
     this.viewPage = null;
   }
 
+  /**
+   * 進入詳細頁
+   * @param i 產品于陣列位置
+   */
   onGoDeatil(i: number): void {
     console.log('go to detail')
     this.dataIndex = i
     this.viewPage = false
   }
 
+  /**
+   * 前往頁
+   */
   onGoTo(): void {
     console.log('go to')
     switch(this.viewPage) {
@@ -193,6 +219,11 @@ export default class HomeView extends Vue {
     }
   }
 
+  /**
+   * 判斷用戶稱呼
+   * @param data_age 用戶年齡
+   * @param data_gender 用戶性別
+   */
   changePeopleTitle(data_age: number, data_gender: string) {
     if(data_age < 26) {
       this.peopleTitle = data_gender == 'female' ? '少女' : '少年'
@@ -205,28 +236,23 @@ export default class HomeView extends Vue {
     }
   }
 
+  /**
+   * 資料處理
+   * @param data 要處理的資料
+   */
   changeString(data: string): string {
     return data.replace(/"/g, "”") 
   }
 
-  // changeBigImage(): void {
-  //   switch(this.companyName) {
-  //     case '業成集團X英特盛科技':
-  //       break;
-  //     case '業成集團X英特盛科技':
-  //       break;
-  //     case '業成集團X英特盛科技':
-  //       break;
-  //     case '業成集團X英特盛科技':
-  //       break;
-  //     case '業成集團X英特盛科技':
-  //       break;
-  //     case '業成集團X英特盛科技':
-  //       break;
-  //     case '業成集團X英特盛科技':
-  //       break;
-  //   }
-  // }
+  changeBr(data: string): string {
+    return data.replace(/\n/g, "<br>") 
+  }
+
+  getBannerData(): any {
+    return this.data.filter((item: any, i: number) => {
+      if (i != this.dataIndex) return item
+    })
+  }
 }
 </script>
 
@@ -305,6 +331,7 @@ export default class HomeView extends Vue {
 
   .item-info {
     text-align: left;
+    height: 286px;
   }
 
   .image-box {
@@ -323,6 +350,10 @@ export default class HomeView extends Vue {
 
   .item-map {
     text-align: left  ;
+
+    img {
+      width: 100%;
+    }
   }
 
   .big-image {
@@ -344,15 +375,32 @@ export default class HomeView extends Vue {
       letter-spacing: 0.1em;
     }
   }
+
+  .banner-bar {
+    display: flex;
+    column-gap: 3px;
+    // background-color: white;
+    height: 60px;
+
+    div {
+      flex: 33%;
+      background-color: rgba(white, 20%);
+      padding: 8px 16px;
+      line-height: 44px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
   
   .btn-touch {
-    width: 500px;
-    height: 500px;
+    width: 455px;
+    height: 455px;
     border-radius: 50%;
     background-color: rgba($color: #000000, $alpha: .4);
     position: absolute;
-    left: calc(50vw - 250px);
-    top: calc(50vh - 250px);
+    left: calc(50vw - 227.5px);
+    top: calc(50vh - 227.5px);
     z-index: 99999;
 
 
@@ -361,13 +409,14 @@ export default class HomeView extends Vue {
     justify-content: center;
 
     img {
-      width: 40%;
+      width: 50%;
     }
   }
 
   .row-3 {
     display: grid;
-    grid-template-columns: 30% 5% 30% 5% 30%;
+    grid-template-columns: 30% 30% 30%;
+    column-gap: 5%;
   }
   
   .footer-box {
@@ -413,6 +462,8 @@ export default class HomeView extends Vue {
     background-image: url('../assets/img/img_rightDoor.png');
     
   }
+
+// #region 主頁動畫效果
   .right-enter-active,
   .right-leave-active,
   .left-enter-active,
@@ -433,6 +484,8 @@ export default class HomeView extends Vue {
   .touch-leave-to {
     opacity: 0;
   }
+// #endregion
+
 
   .m-t-30 {
     margin-top: 30px;
@@ -440,6 +493,9 @@ export default class HomeView extends Vue {
 
   .f-24 {
     font-size: 24px;
+  }
+  .f-28 {
+    font-size: 28px;
   }
   .f-32 {
     font-size: 32px;
