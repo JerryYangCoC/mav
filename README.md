@@ -128,6 +128,10 @@ HomePage part2->HomePage part1: on click return button
 | finish           |      |      |      | V     |
 
 
+## Use API
+
+- GET - People info - `http://localhost/api/detection/recommend`
+
 ## Reference
 
 - [Vue CLI](https://cli.vuejs.org/)
