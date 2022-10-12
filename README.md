@@ -5,9 +5,6 @@
 > GitHub [Retailing-Data/tie-frontend-vue](https://github.com/Retailing-Data/tie-frontend-vue)
 
 
-## Table of Content
-[ToC]
-
 ## What do I start?
 
 ### Step 1: Install node.js
@@ -112,20 +109,6 @@ HomePage part2->HomePage part1: on click return button
 ```
 > npm run lint
 ```
-
-## Work Breakdown Structure
-
-| work             | 10/5 | 10/6 | 10/7 | 10/11 |
-| --------         | ---- | ---- | ---- | ----- |
-| Init project     | V    |      |      |       |
-| create HomePage  | V    |      |      |       |
-| door animation   | V    |      |      |       |
-| to part 1        | V    |      |      |       |
-| to part 2        |      |  V   |      |       |
-| to part 3        |      |      |  V   |       |
-| get API          |      |      |  V   |       |
-| test             |      |      |      | V     |
-| finish           |      |      |      | V     |
 
 
 ## Use API
