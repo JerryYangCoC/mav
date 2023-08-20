@@ -1,9 +1,6 @@
-# TIE Frontend - Technical Documentation
+# MAV Frontend - Technical Documentation
 
 ###### tags: `Vue`、`Vuex`、`TypeScript`
-
-> GitHub [Retailing-Data/tie-frontend-vue](https://github.com/Retailing-Data/tie-frontend-vue)
-
 
 ## What do I start?
 
@@ -70,15 +67,6 @@ Download [VS Code](https://code.visualstudio.com/download), install Visual Studi
  └──package.json                 /// 專案、相依套件設定檔
 ```
 
-## Activity Diagram
-
-```sequence
-Note left of HomePage part1: start
-HomePage part1->HomePage part2: on click start button \n get API to people info
-HomePage part2->HomePage part3: on click image
-HomePage part3->HomePage part2: on click return button
-HomePage part2->HomePage part1: on click return button
-```
 
 ## Project setup
 ```
@@ -111,10 +99,6 @@ HomePage part2->HomePage part1: on click return button
 ```
 
 
-## Use API
-
-- GET - People info - `http://localhost/api/detection/recommend`
-
 ## Reference
 
 - [Vue CLI](https://cli.vuejs.org/)
@@ -122,6 +106,4 @@ HomePage part2->HomePage part1: on click return button
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-
-## Want...
 

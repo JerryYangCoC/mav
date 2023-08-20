@@ -1,7 +1,9 @@
 import { createStore } from 'vuex'
+import { moduleCopy } from './copy'
 
 export default createStore({
   state: {
+    copy: moduleCopy.state
   },
   getters: {
   },
@@ -10,5 +12,6 @@ export default createStore({
   actions: {
   },
   modules: {
+    moduleCopy
   }
 })
