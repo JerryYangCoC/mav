@@ -1,13 +1,13 @@
 <template>
     <div class="roadmap-box">
-      <span>文案製作作業 - 新增</span>
+      <span>文案製作作業 - {{ isEdit ? '修改' : '瀏覽'}}</span>
     </div>
-    <form @submit.prevent="onCreate()" style="padding: 18px 24px;">
+    <div style="padding: 18px 24px;">
         <div style="text-align: left;">
             <div style="display: grid; grid-template-columns: 33% 33%;">
                 <div>
                     <span><span class="ask-red">*</span>文案型態：</span>
-                    <select v-model="copyData.CopyWriteType" required>
+                    <select v-model="copyData.CopyWriteType" disabled>
                         <option value="01">01：簡訊</option>
                         <option value="02">02：APP</option>
                     </select>
@@ -15,7 +15,7 @@
 
                 <div>
                     <span><span class="ask-red">*</span>旅程型態：</span>
-                    <select style="min-width: 185px;" v-model="copyData.JourneyType" @change="changeParam()" required>
+                    <select style="min-width: 185px;" v-model="copyData.JourneyType" disabled>
                         <option value="01">01：回券-POS COUPON</option>
                         <option value="02">02：回券-精算抵用券</option>
                         <option value="03">03：生日</option>
@@ -34,39 +34,38 @@
                 <div>
                     <span>文案編號：</span>
                     <input type="text" v-model="copyData.CopyWriteID" disabled />
-                    <!-- <button style="width: 60px;" @click="visible = true">複製</button> -->
-                    <input type="button" style="width: 60px;" @click="visible = true" value="複製" />
+                    <button style="width: 60px;" disabled>複製</button>
                 </div>
 
                 <div>
                     <span><span class="ask-red">*</span>有效起日：</span>
-                    <!-- <input style="width: 153px;" class="sd-text" type="date" max="9999-12-31" aria-required="false" aria-invalid="true" v-model="copyData.StartYMD"> -->
-                    <input type="text" id="StartYMD" @change="changeDate($event.target)" v-model="copyData.StartYMD" required />
+                    <!-- <input style="width: 153px;" class="sd-text" type="date" max="9999-12-31" aria-required="false" aria-invalid="false" v-model="copyData.StartYMD" :disabled="!isEdit"> -->
+                    <input type="text" id="StartYMD" @change="changeDate($event.target)" v-model="copyData.StartYMD" :disabled="!isEdit" />
                 </div>
 
                 <div>
                     <span><span class="ask-red">*</span>有效訖日：</span>
-                    <!-- <input style="width: 153px;" class="sd-text" type="date" max="9999-12-31" aria-required="true" aria-invalid="false" v-model="copyData.EndYMD"> -->
-                    <input type="text" id="EndYMD" @change="changeDate($event.target)" v-model="copyData.EndYMD" required />
+                    <!-- <input style="width: 153px;" class="sd-text" type="date" max="9999-12-31" aria-required="false" aria-invalid="false" v-model="copyData.EndYMD" :disabled="!isEdit"> -->
+                    <input type="text" id="EndYMD" @change="changeDate($event.target)" v-model="copyData.EndYMD" :disabled="!isEdit" />
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 50% 50%;">
                 <div>
                     <span><span class="ask-red">*</span>文案名稱：</span>
-                    <input type="text" style="width: 250px;" v-model="copyData.CopyWriteName" required />
+                    <input type="text" style="width: 250px;" v-model="copyData.CopyWriteName" :disabled="!isEdit" />
                 </div>
 
                 <div v-if="copyData.CopyWriteType == '02'">
                     <span><span class="ask-red">*</span>APP推播標題：</span>
-                    <input type="text" style="width: 250px;" v-model="copyData.title" required />
+                    <input type="text" style="width: 250px;" v-model="copyData.title" :disabled="!isEdit" />
                 </div>
             </div>
             
             <div>
                 <div>
                     <span>參數型態：</span>
-                    <select v-model="copyData.ParamType" @change="changeParam()">
+                    <select v-model="copyData.ParamType" @change="changeParam()" :disabled="!isEdit">
                         <option value="00">00：無</option>
                         <option value="01">01：預定義</option>
                         <option value="02">02：自定義</option>
@@ -77,18 +76,18 @@
             <div>
                 <div>
                     <span><span class="ask-red">*</span>文案參數：</span>
-                    <input type="text" placeholder="參數一" v-model="copyData.Param1" :disabled="copyData.ParamType != '02'"  />
-                    <input type="text" placeholder="參數二" v-model="copyData.Param2" :disabled="copyData.ParamType != '02'"  />
-                    <input type="text" placeholder="參數三" v-model="copyData.Param3" :disabled="copyData.ParamType != '02'"  />
-                    <input type="text" placeholder="參數四" v-model="copyData.Param4" :disabled="copyData.ParamType != '02'"  />
-                    <input type="text" placeholder="參數五" v-model="copyData.Param5" :disabled="copyData.ParamType != '02'" />
+                    <input type="text" placeholder="參數一" v-model="copyData.Param1" :disabled="!isEdit" />
+                    <input type="text" placeholder="參數二" v-model="copyData.Param2" :disabled="!isEdit" />
+                    <input type="text" placeholder="參數三" v-model="copyData.Param3" :disabled="!isEdit" />
+                    <input type="text" placeholder="參數四" v-model="copyData.Param4" :disabled="!isEdit" />
+                    <input type="text" placeholder="參數五" v-model="copyData.Param5" :disabled="!isEdit" />
                 </div>
             </div>
 
             <div v-if="copyData.CopyWriteType == '02'">
                 <div>
                     <span><span class="ask-red">*</span>顯示類型：</span>
-                    <select v-model="copyData.type" required>
+                    <select v-model="copyData.type" :disabled="!isEdit">
                         <option value="show">show: 顯示</option>
                         <option value="open">open: 打開</option>
                     </select>
@@ -98,15 +97,14 @@
             <div v-if="copyData.CopyWriteType == '02' && copyData.type == 'open'">
                 <div>
                     <span><span class="ask-red">*</span>推播網址：</span>
-                    <input type="text" v-model="copyData.cta_url" required />
+                    <input type="text" v-model="copyData.cta_url" :disabled="!isEdit" />
                 </div>
-
             </div>
 
             <div v-if="copyData.CopyWriteType == '02'">
                 <div>
                     <span>圖片網址：</span>
-                    <input type="text" v-model="copyData.image" pattern="^https.*" />
+                    <input type="text" v-model="copyData.image" pattern="^https.*" :disabled="!isEdit" />
                 </div>
             </div>
 
@@ -115,7 +113,7 @@
                     <span style="padding-top: 8px;"><span class="ask-red">*</span>文案內容：</span>
                     <textarea
                         v-model="copyData.message"
-                        required
+                        :disabled="!isEdit"
                         :placeholder="copyData.CopyWriteType == '01' ? '字數一則70字' : '字數限制200字，建議70字以內所有手機才能顯示'"
                         :maxlength="copyData.CopyWriteType == '01' ? 70 : 200"></textarea>
                 </div>
@@ -124,74 +122,34 @@
             <div v-if="copyData.CopyWriteType == '02' && copyData.type == 'open'">
                 <div>
                     <span>按鈕標題：</span>
-                    <input type="text" v-model="copyData.cta_title" />
+                    <input type="text" v-model="copyData.cta_title" :disabled="!isEdit" />
                 </div>
             </div>
         </div>
 
         <div style="display: flex; justify-content: flex-end;">
+            <div style="padding: 12px 6px;" v-if="!isEdit">
+                <!-- <button class="btn-blue" style="--i: url('/img/create.png')" @click="(() => {isEdit = true})">修改</button> -->
+                <input type="button" class="btn" style="--i: url('/img/create.png')" @click="(() => {isEdit = true})" value="修改" />
+            </div>
+            
+            <div style="padding: 12px 6px;" v-if="!isEdit">
+                <!-- <button class="btn-red" style="--i: url('/img/clear.png')" @click="onDel()">刪除</button> -->
+                <input type="button" class="btn" style="--i: url('/img/clear.png')" @click="onDel()" value="刪除" />
+            </div>
+
             <div style="padding: 12px 6px;">
-                <!-- <button class="btn" style="--i: url('/img/redo.png')" @click="onToList()">返回</button> -->
+                <!-- <button class="btn-blue" style="--i: url('/img/redo.png')" @click="onToList()">返回</button> -->
                 <input type="button" class="btn" style="--i: url('/img/redo.png')" @click="onToList()" value="返回" />
             </div>
 
-            <div style="padding: 12px 6px;">
-                <!-- <button class="btn" style="--i: url('/img/baseline_cleaning_services.png');" @click="init()">清除</button> -->
-                <input type="button" class="btn" style="--i: url('/img/baseline_cleaning_services.png');" @click="init()" value="清除" />
-            </div>
-
-            <div style="padding: 12px 6px;">
-                <!-- <button class="btn" style="--i: url('/img/baseline_save.png'); width: 140px;" @click="onCreate()">存檔(連續新增)</button> -->
-                <input type="submit" class="btn"  style="--i: url('/img/baseline_save.png'); width: 140px;" value="存檔(連續新增)" />
+            <div style="padding: 12px 6px;" v-if="isEdit">
+                <!-- <button class="btn-blue" style="--i: url('/img/baseline_save.png'); width: 120px;" @click="onEdit()">存檔(返回)</button> -->
+                <input type="button" class="btn" style="--i: url('/img/baseline_save.png'); width: 100px;" @click="onEdit()" value="資料送出" />
             </div>
         </div>
-    </form>
-
-    <Dialog v-model:visible="visible" :closable="false" modal header="複製文案" :style="{ width: '50vw' }">
-        <div>
-            <div style="display: flex; align-items: center;">
-                <span>文案：</span>
-                <input type="text" v-model="changeCopy.CopyWriteID" disabled />
-                <input type="text" v-model="changeCopy.CopyWriteName" disabled />
-                <input type="button" class="btn-white" style="--i: url('/img/more_horiz.svg'); width: 40px;" @click="queryView = true; onSearch();" /> 
-            </div>
-        </div>
-        <template #footer>
-            <div style="display: flex; justify-content: center;">
-                <input type="button" class="btn" style="--i: url('/img/redo.png')" @click="visible = false" value="返回" />
-                <input type="button" class="btn" style="--i: url('/img/baseline_cleaning_services.png');" value="清除" @click="initCopy()" />
-                <input type="button" class="btn"  style="--i: url('/img/baseline_save.png')" value="確認" @click="copyData = changeCopy; visible = false;" />
-            </div>
-        </template>
-
-        
-        <Dialog v-model:visible="queryView" modal :show-header="false" :style="{ width: '60vw' }">
-            <div class="box-copy">
-                <div style="text-align: center;">
-                    <input type="text" style="width: 200px;" v-model="query.CopyWriteID" placeholder="編號" @change="onSearch()" />
-                    <input type="text" style="width: 200px;" v-model="query.CopyWriteName" placeholder="名稱" @change="onSearch()" />
-                    <!-- <button @click="queryView = false">返回</button> -->
-                </div>
-                <TreeTable
-                    :value="copyList()"
-                    :paginator="true"
-                    :rows="10"
-                    :rowsPerPageOptions="[5, 10, 25, 50]"
-                    :alwaysShow="true"
-                    paginatorTemplate="RowsPerPageDropdown PrevPageLink PageLinks NextPageLink JumpToPageInput CurrentPageReport"
-                    currentPageReportTemplate="{totalRecords} 筆 / 共 {totalPages} 頁"
-                    >
-                    <Column header="選取" style="width: 90px;">
-                        <template #body="slotProps">
-                            <a class="btn-blue" @click="changeCopy = slotProps.node.data; queryView = false;">選取</a>
-                        </template>
-                    </Column>
-                    <Column field="CopyWriteID" header="編號"></Column>
-                    <Column field="CopyWriteName" header="名稱"></Column>
-                </TreeTable>
-            </div>
-        </Dialog>
-    </Dialog>
+    </div>
+    <ConfirmDialog></ConfirmDialog>
 </template>
 
 <script lang="ts">
@@ -201,8 +159,7 @@ import { CopyModel } from '../model/copyList.model';
 import Dialog from 'primevue/dialog';
 import ConfirmDialog from 'primevue/confirmdialog';
 import axios from 'axios';
-import { Model } from 'survey-core';
-import TreeTable from 'primevue/treetable';
+import { useConfirm } from "primevue/useconfirm";
 import moment from 'moment';
 
 @Options({
@@ -210,72 +167,59 @@ import moment from 'moment';
 
     }
 })
-export default class AddCopyView extends Vue {
+export default class EditCopyView extends Vue {
     copyData: CopyModel = {
         CopyWriteName: '',
         CopyWriteType: '01',
-        FileType: '1',
+        FileType: '2',
         JourneyType: '',
         StartYMD: '',
         EndYMD: '',
-        type: '',
+        type: 'show',
     };
-    visible = false;
-    queryView = false;
-    query = {
-        CopyWriteName: '',
-        CopyWriteType: '',
-        CopyWriteID: ''
-    }
-    changeCopy: CopyModel =  {
-        CopyWriteID: '',
-        CopyWriteName: '',
-        CopyWriteType: '',
-        JourneyType: '',
-        StartYMD: '',
-        EndYMD: '',
-        type: '',
-    }; // 複製文案選擇資料
+    isEdit = false;
+    confirm = useConfirm();
 
     /**
      * 初始化
      */
     created(): void {
-        console.log('new add copy page')
+        console.log('new view copy page')
+        this.init();
     }
 
     init(): void {
-        this.copyData = {
-            CopyWriteName: '',
-            CopyWriteType: '01',
-            FileType: '1',
-            JourneyType: '',
-            StartYMD: '',
-            EndYMD: '',
-            type: '',
-        }
+        this.copyData = store.state.copy.copyDetail
     }
 
-    initCopy(): void {
-        this.changeCopy =  {
-            CopyWriteID: '',
-            CopyWriteName: '',
-            CopyWriteType: '',
-            JourneyType: '',
-            StartYMD: '',
-            EndYMD: '',
-            type: '',
-        };
+    onDel(): void {
+        this.confirm.require({
+            message: '請確認是否「刪除」！',
+            header: '確認',
+            acceptClass: 'p-button-danger',
+            acceptLabel: '取消',
+            rejectLabel: '確認',
+            reject: () => {
+                this.copyData.FileType = '3'
+                store.dispatch('setCopy', this.copyData)
+                setTimeout(() => {
+                    this.onToList();
+                }, 300)
+            }
+        });
     }
 
     onToList(): void {
         this.$router.push({path: 'copy', query: this.$router.currentRoute.value.query});
+        store.state.copy.copyDetail = null
     }
 
-    onCreate(): void {
+    onEdit(): void {
         console.log(this.copyData)
         this.copyData.UserID = this.$router.currentRoute.value.query?.UserID?.toString();
-        this.copyData.FileType = '1';
+        this.copyData.FileType = '2'
+        this.copyData.StartYMD = this.copyData.StartYMD.replace(/-/g, '/')
+        this.copyData.EndYMD = this.copyData.EndYMD.replace(/-/g, '/')
 
         axios.post('http://10.2.126.194:8030/app/v1/api/CDP/CopyWriteImport', this.copyData)
             .then((res) => {
@@ -284,8 +228,8 @@ export default class AddCopyView extends Vue {
                     switch(res.data?.Status) {
                         case '0':
                             // 成功
-                            alert('新增成功')
-                            this.init();
+                            alert('修改成功')
+                            this.onToList();
                             break;
 
                         case '1':
@@ -303,25 +247,12 @@ export default class AddCopyView extends Vue {
             })
         // store.dispatch('setCopy', this.copyData)
     }
-        
-    /**
-     * 查詢
-     */
-    onSearch(): void {
-        this.query.CopyWriteType = this.copyData.CopyWriteType;
-        store.dispatch('getCopy', this.query)
-    }
-
-    copyList(): any {
-        return store.state.copy.copyList;
-    }
-
 
     /**
      * 轉換日期
      * @param value 日期Event
      */
-    changeDate(value: any): void {
+     changeDate(value: any): void {
         let date = value.value
         if (date?.length == 4) {
         date = moment(date, "MMDD").format('YYYY/MM/DD')
@@ -383,7 +314,5 @@ export default class AddCopyView extends Vue {
 }
 </script>
 <style scoped lang="scss">
-.ask-red {
-    margin-top: 8px;
-}
+
 </style>

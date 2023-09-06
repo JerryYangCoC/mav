@@ -1,75 +1,87 @@
 <template>
+    <div class="roadmap-box">
+      <span>文案製作作業 - 查詢</span>
+    </div>
     <div>
-      <div>
+      <form @submit.prevent="onSearch()">
         <!-- 查詢條件 -->
-        <div style="display: grid; grid-template-columns: 50% 50%;">
+        <div class="box-query">
           <div>
             <span>文案型態：</span>
-            <select>
-              <option>全選</option>
-              <option>簡訊</option>
-              <option>APP</option>
+            <select v-model="query.CopyWriteType">
+              <option value="00">00：全選</option>
+              <option value="01">01：簡訊</option>
+              <option value="02">02：APP</option>
             </select>
           </div>
   
           <div>
             <span>旅程型態：</span>
-            <select>
-              <option>全選</option>
-              <option>回券-POS COUPON</option>
-              <option>回券-精算抵用券</option>
-              <option>生日</option>
-              <option>新會員活動</option>
-              <option>新會員權益</option>
-              <option>商品購買</option>
-              <option>金卡升等-金續金</option>
-              <option>金卡升等-普升金</option>
-              <option>準金卡升等</option>
-              <option>名單匯入</option>
+            <select style="min-width: 185px;" v-model="query.JourneyType">
+              <option value="00">00：全選</option>
+              <option value="01">01：回券-POS COUPON</option>
+              <option value="02">02：回券-精算抵用券</option>
+              <option value="03">03：生日</option>
+              <option value="04">04：新會員活動</option>
+              <option value="05">05：新會員權益</option>
+              <option value="06">06：商品購買</option>
+              <option value="07">07：金卡升等-金續金</option>
+              <option value="08">08：金卡升等-普升金</option>
+              <option value="09">09：準金卡升等</option>
+              <option value="10">10：名單匯入</option>
             </select>
           </div>
   
           <div>
             <span>文案編號：</span>
-            <input type="text" />
+            <input type="text" v-model="query.CopyWriteID" />
           </div>
   
           <div>
             <span>文案內容：</span>
-            <input type="text" />
+            <input type="text" v-model="query.message" />
           </div>
   
           <div>
             <span>文案名稱：</span>
-            <input type="text" />
+            <input type="text" v-model="query.CopyWriteName" />
           </div>
   
           <div>
-            <span>期間：</span>
-            <input type="date" />
-            ～
-            <input type="date" />
+            <span><span class="ask-red">*</span>期間：</span>
+            <div>
+              <!-- <input style="width: 153px;" class="sd-text" type="date" max="9999-12-31" aria-required="false" aria-invalid="false" v-model="query.StartYMD" /> -->
+              <input type="text" id="StartYMD" @change="changeDate($event.target)" v-model="query.StartYMD" required />
+              ～
+              <!-- <input style="width: 153px;" class="sd-text" type="date" max="9999-12-31" aria-required="false" aria-invalid="false" v-model="query.EndYMD" /> -->
+              <input type="text" id="EndYMD" @change="changeDate($event.target)" v-model="query.EndYMD" required />
+            </div>
+            <span class="ask-red">限查2年資料</span>
           </div>
         </div>
 
-        <div style="display: flex; justify-content: center; background-color: rgb(217, 217, 217);">
+        <div style="display: flex; justify-content: center; background-color: #f6f6f6;">
           <div style="padding: 12px 6px;">
-            <button class="btn-blue" style="--i: url('/img/search.png')" @click="onSearch()">查詢</button>
+            <!-- <button class="btn" style="--i: url('/img/search.png')" @click="onSearch()">查詢</button> -->
+            <input class="btn" style="--i: url('/img/search.png')" type="submit" value="查詢" />
           </div>
           
           <div style="padding: 12px 6px;">
-            <button class="btn-blue" style="--i: url('/img/baseline_cleaning_services.png'); width: 120px;">清除重來</button>
+            <!-- <button class="btn" style="--i: url('/img/baseline_cleaning_services.png')" @click="init()">清除</button> -->
+            <input class="btn" style="--i: url('/img/baseline_cleaning_services.png')" type="button" @click="init()" value="清除" />
+          </div>
+          
+          <div style="padding: 12px 6px;">
+            <!-- <button class="btn" style="--i: url('/img/add.png'); width: 100px;" @click="onToAdd()">新增資料</button> -->
+            <input class="btn" style="--i: url('/img/add.png'); width: 100px;" type="button" @click="onToAdd()" value="新增資料" />
           </div>
 
           <div style="padding: 12px 6px;">
-            <button class="btn-green" style="--i: url('/img/add.png')" @click="onToAdd()">新增</button>
-          </div>
-
-          <div style="padding: 12px 6px;">
-            <button class="btn-blue" style="--i: url('/img/file_download.png'); width: 140px;">匯出EXCEL</button>
+            <!-- <button class="btn" style="--i: url('/img/file_download.png'); width: 140px;">匯出EXCEL</button> -->
+            <input class="btn" style="--i: url('/img/file_download.png'); width: 120px;" type="button" @click="onExportExcel()" value="匯出EXCEL" />
           </div>
         </div>
-      </div>
+      </form>
 
       <div>
         <!-- 文案清單 -->
@@ -77,15 +89,15 @@
           <TreeTable
             :value="CopyList()"
             :paginator="true"
-            :rows="5"
+            :rows="10"
             :rowsPerPageOptions="[5, 10, 25, 50]"
             :alwaysShow="true"
             paginatorTemplate="RowsPerPageDropdown PrevPageLink PageLinks NextPageLink JumpToPageInput CurrentPageReport"
-            currentPageReportTemplate="{totalRecords} 筆/共 {totalPages} 頁"
+            currentPageReportTemplate="{totalRecords} 筆 / 共 {totalPages} 頁"
             >
               <Column field="CopyWriteType" header="文案型態">
                 <template #body="slotProps">
-                  {{ slotProps.node.data.CopyWriteType }}： {{ slotProps.node.data.CopyWriteType == '1' ? '簡訊' : 'APP' }}
+                  {{ slotProps.node.data.CopyWriteType }}： {{ slotProps.node.data.CopyWriteType == '01' ? '簡訊' : 'APP' }}
                 </template>
               </Column>
               <Column field="JourneyType" header="旅程型態">
@@ -95,12 +107,15 @@
               </Column>
               <Column field="CopyWriteID" header="文案編號"></Column>
               <Column field="CopyWriteName" header="文案名稱"></Column>
-              <!-- <Column field="" header="文案內容"></Column> -->
+              <Column field="message" header="文案內容"></Column>
               <Column field="StartYMD" header="有效起日"></Column>
-              <Column field="EndYMD" header="有效迄日"></Column>
-              <Column header="功能">
+              <Column field="EndYMD" header="有效訖日"></Column>
+              <Column header="功能" style="width: 90px;">
                 <template #body="slotProps">
-                    <button @click="onDetail(slotProps.node.data.CopyWriteID)">瀏覽</button>
+                    <button
+                      style="width: 54px;"
+                      class="btn-blue"
+                      @click="onDetail(slotProps.node.data.CopyWriteID)">瀏覽</button>
                 </template>
               </Column>
           </TreeTable>
@@ -116,6 +131,10 @@ import Paginator from "primevue/paginator";
 import Column from 'primevue/column';
 import TreeTable from 'primevue/treetable';
 import store from '@/store';
+import { TreeNode } from 'primevue/tree';
+import { CopyListModel, CopyModel } from '@/model/copyList.model';
+import moment from 'moment';
+import * as XLSX from 'xlsx';
 
 @Options({
   components: {
@@ -125,6 +144,15 @@ import store from '@/store';
   },
 })
 export default class CopyView extends Vue {
+  query: CopyModel = {
+    CopyWriteID: '',
+    CopyWriteName: '',
+    CopyWriteType: '',
+    JourneyType: '',
+    StartYMD: '',
+    EndYMD: '',
+    message: ''
+  };
 
   /**
    * 初始化
@@ -133,77 +161,141 @@ export default class CopyView extends Vue {
     console.log('new copy page')
   }
 
+  init(): void {
+    this.query = {
+      CopyWriteID: '',
+      CopyWriteName: '',
+      CopyWriteType: '',
+      JourneyType: '',
+      StartYMD: '',
+      EndYMD: '',
+      message: ''
+    }
+  }
+
   CopyList(): any {
     return store.state.copy.lists;
+  }
+
+  changeData(value: string): string {
+    return value.replace(/\//g, '-')
   }
 
   /**
    * 查詢
    */
   onSearch(): void {
-    store.dispatch('getListCopy')
+    store.dispatch('getListCopy', this.query)
   }
 
+  /**
+   * 瀏覽
+   * @param id 文案編號
+   */
   onDetail(id: string): void {
-    console.log('getDetail', id)
     store.dispatch('getDetailCopy', id)
   }
 
+  /**
+   * 前往新增資料
+   */
   onToAdd(): void {
-    this.$router.push("copy/add");
+    this.$router.push({path: '/add', query: this.$router.currentRoute.value.query});
+  }
+
+  /**
+   * 匯出Excel
+   */
+  onExportExcel(): void {
+    /* create a new blank workbook */
+    let workbook = XLSX.utils.book_new();
+    let worksheet = null
+    let data = this.CopyList().map((res: CopyListModel) => {
+      return {
+        CopyWriteType: res.data.CopyWriteType + '：' + this.copyType(res.data.CopyWriteType),
+        JourneyType: res.data.JourneyType + '：' + this.journeyType(res.data.JourneyType),
+        CopyWriteID: res.data.CopyWriteID,
+        CopyWriteName: res.data.CopyWriteName,
+        message: res.data.message,
+        StartYMD: res.data.StartYMD,
+        EndYMD: res.data.EndYMD
+      }
+    })
+    
+    worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.sheet_add_aoa(worksheet, [["文案型態", "旅程型態", "文案編號", "文案名稱", "文案內容", "有效起日", "有效訖日"]], { origin: "A1" });
+    XLSX.utils.book_append_sheet(workbook, worksheet);
+
+    
+    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const data1 = new Blob([excelBuffer], { type: fileType });
+    
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    var FileSaver = require('file-saver');
+    FileSaver.saveAs(data1, "文案匯出");
+  }
+
+  /**
+   * 轉換日期
+   * @param value 日期Event
+   */
+  changeDate(value: any): void {
+    let date = value.value
+    if (date?.length == 4) {
+      date = moment(date, "MMDD").format('YYYY/MM/DD')
+    }
+    
+    if (date?.length == 8) {
+      date = moment(date, "YYYYMMDD").format('YYYY/MM/DD')
+    }
+    
+    if (date == 'Invalid date' || date?.length != 10) {
+      date = ''
+      alert('日期格式錯誤')
+    }
+    
+    value.id == 'StartYMD' ? this.query.StartYMD = date : this.query.EndYMD = date
   }
 
   copyType(value: string): string {
-    switch(value) {
-      case '1':
-        return '簡訊'
-
-      case '2':
-        return 'APP'
-
-      default:
-        return ''
+    const typeValue: any = {
+      '01': '簡訊',
+      '02': 'APP'
     }
+
+    return typeValue[value] ?? '';
   }
 
   journeyType(value: string): string {
-    switch(value) {
-      case '01':
-        return '回券-POS COUPON'
-      
-      case '02':
-        return '回券-精算抵用券'
-      
-      case '03':
-        return '生日'
-      
-      case '04':
-        return '新會員活動'
-      
-      case '05':
-        return '新會員權益'
-      
-      case '06':
-        return '商品購買'
-      
-      case '07':
-        return '金卡升等-金續金'
-      
-      case '08':
-        return '金卡升等-普升金'
-      
-      case '09':
-        return '準金卡升等'
-      
-      case '10':
-        return '名單匯入'
-      
-      default:
-        return ''
+    const typeValue: any = {
+      '01': '回券-POS COUPON',
+      '02': '回券-精算抵用券',
+      '03': '生日',
+      '04': '新會員活動',
+      '05': '新會員權益',
+      '06': '商品購買',
+      '07': '金卡升等-金續金',
+      '08': '金卡升等-普升金',
+      '09': '準金卡升等',
+      '10': '名單匯入',
     }
+
+    return typeValue[value] ?? ''
   }
 }
 </script>
 <style scoped lang="scss">
+.box-query {
+  display: grid;
+  grid-template-columns: 35% 65%;
 
+  > div {
+    display: grid;
+    grid-template-columns: 140px auto;
+    align-items: center;
+    justify-content: start;
+    justify-items: end;
+  }
+}
 </style>
