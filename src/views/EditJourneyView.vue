@@ -35,7 +35,7 @@
                                         <input type="button" class="btn" style="--i: url('/img/sent.png'); width: 100px;" @click="onCreate()" value="資料送出" />
                                     </div>
                                 </div>
-                                <JourneyTmp101 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="query" :active="(() => {
+                                <JourneyTmp101 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="query" :active="(() => {
                                     journeyData.JourneyName = query.JourneyName
                                     journeyData.StartDate = query.StartDate
                                     journeyData.EndDate = query.EndDate
@@ -44,7 +44,7 @@
                                     bottomDivView = false;
                                     isEdit = true
                                     })" v-if="selectContent?.NodeType == '101'"></JourneyTmp101>
-                                <JourneyTmp102 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
+                                <JourneyTmp102 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.PeopleLimt = selectContent.PeopleLimt
@@ -59,7 +59,7 @@
                                             }
                                         });
                                     })"  v-if="selectContent?.NodeType == '102'"></JourneyTmp102>
-                                <JourneyTmp103 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
+                                <JourneyTmp103 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.SendType = selectContent.SendType
@@ -73,7 +73,7 @@
                                             }
                                         })
                                     })" v-if="selectContent?.NodeType == '103'"></JourneyTmp103>
-                                <JourneyTmp104 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
+                                <JourneyTmp104 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.PeopleLimt = selectContent.PeopleLimt
@@ -88,7 +88,7 @@
                                             }
                                         });
                                     })" v-if="selectContent?.NodeType == '104'"></JourneyTmp104>
-                                <JourneyTmp106 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
+                                <JourneyTmp106 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.PeopleLimt = selectContent.PeopleLimt
@@ -103,7 +103,7 @@
                                             }
                                         });
                                     })" v-if="selectContent?.NodeType == '106'"></JourneyTmp106>
-                                <JourneyTmp107 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :type="importType" :active="(() => {
+                                <JourneyTmp107 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :type="importType" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.JudgeType = selectContent.JudgeType
@@ -125,7 +125,7 @@
                                     bottomDivView = false;
                                     return;
                                 })" v-if="selectContent?.NodeType == '108'"></JourneyTmp108>
-                                <JourneyTmp201 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
+                                <JourneyTmp201 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.CouponList = selectContent.CouponList
@@ -136,7 +136,7 @@
                                         }
                                     });
                                     })" v-if="selectContent?.NodeType == '201'"></JourneyTmp201>
-                                <JourneyTmp202 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :active="(() => {
+                                <JourneyTmp202 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.CouponList = selectContent.CouponList
@@ -145,7 +145,7 @@
                                         }
                                     });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '202'"></JourneyTmp202>
-                                <JourneyTmp203 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :active="(() => {
+                                <JourneyTmp203 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.SelectDate = selectContent.SelectDate
@@ -154,7 +154,7 @@
                                         }
                                     });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '203'"></JourneyTmp203>
-                                <JourneyTmp204 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :active="(() => {
+                                <JourneyTmp204 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.NewMemStartYMD = selectContent.NewMemStartYMD
@@ -164,7 +164,7 @@
                                         }
                                     });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '204'"></JourneyTmp204>
-                                <JourneyTmp205 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :active="(() => {
+                                <JourneyTmp205 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.NewMemSelectDate = selectContent.NewMemSelectDate
@@ -173,7 +173,7 @@
                                         }
                                     });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '205'"></JourneyTmp205>
-                                <JourneyTmp206 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :active="(() => {
+                                <JourneyTmp206 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.ProductList = selectContent.ProductList
@@ -185,7 +185,7 @@
                                         }
                                     });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '206'"></JourneyTmp206>
-                                <JourneyTmp207 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :active="(() => {
+                                <JourneyTmp207 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.SelectDate = selectContent.SelectDate
@@ -194,7 +194,7 @@
                                         }
                                     });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '207'"></JourneyTmp207>
-                                <JourneyTmp208 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :active="(() => {
+                                <JourneyTmp208 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.SelectDate = selectContent.SelectDate
@@ -203,7 +203,7 @@
                                         }
                                     });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '208'"></JourneyTmp208>
-                                <JourneyTmp209 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :active="(() => {
+                                <JourneyTmp209 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.DateType = selectContent.DateType
@@ -215,7 +215,7 @@
                                         }
                                     });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '209'"></JourneyTmp209>
-                                <JourneyTmp210 :isEdit="isEdit" :edit="(() => { if (journeyData.SendFlag == '0') isEdit = false })" :dd="journeyData" :active="(() => {
+                                <JourneyTmp210 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.ActivityType = selectContent.ActivityType
@@ -417,68 +417,6 @@ export default class EditJourneyView extends Vue {
 
         column++;
         column++;
-        // if (rowCont <= row1) {
-//         // }
-
-        // for (let item of this.dataTree) {
-            // if (!useList.includes(item.NodeId)) {
-            //     console.log('item', item)
-            //     lists.push({value: this.category(item), data: item, column: column, row: row1})
-            //     useList.push(item.NodeId)
-            //     if (item?.Position.length == 1) {
-            //         if (item.NodeType != '105' && item.NodeType != '108') {
-            //             // column++;
-            //             lists.push({value: this.ALine(), column: column+1, row: row1})
-            //         }
-            //     }
-            //     if (item.NodeType == '105' && row == rowCont) row++;
-            //     if (rowCont <= row1) {
-            //         column++;
-            //         column++;
-            //         row1 = row
-            //     } else {
-            //         row1++;
-            //     }
-            // }
-
-            // if (item?.Position.length > 1) {
-            //     rowCont += item.Position.length - 1;
-            //     // column++;
-            //     let contentList = item.Position.map((v: any) => {
-            //         return v.label
-            //     })
-            //     lists.push({value: this.BLine(contentList), column: column+1, row: row})
-        
-            //     // column++;
-            //     let row2 = row;
-            //     for (let item2 of this.dataTree) {
-            //         if (item.Position.some((e: any) => e.target.toString() === item2.NodeId.toString())) {
-            //             console.log('item2', item2)
-            //             useList.push(item2.NodeId)
-            //             lists.push({value: this.category(item2), data: item2, column: column+2, row: row2 })
-            //             if (item2.Position.length == 1) {
-            //                 if (item2.NodeType != '105') lists.push({value: this.ALine(), column: column+3, row: row2})
-            //                 else if (row2 == row) {
-            //                     row++;
-            //                     row1=row;
-            //                 }
-            //                 else if (row != rowCont) rowCont--;
-            //             } else if (item2.NodeType == '105') {
-            //                 if (row == rowCont) row++;
-            //                 else rowCont--;
-            //             }
-            //             row2++;
-            //         }
-            //     }
-
-            //     if (rowCont <= row2) {
-            //         column++;
-            //         column++;
-            //         column++;
-            //         column++;
-            //     }
-            // }
-        // }
 
         this.col = 1;
         this.row = 1;
@@ -987,6 +925,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "2",
                         NodeName: dragText,
                         NodeType: "103",
+                        IsBestOffer: '0',
                         Position: [
                             {
                                 "SeqId": "e2-3",
@@ -1000,6 +939,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "2",
                         NodeName: dragText,
                         NodeType: "103",
+                        IsBestOffer: '0',
                         Position: [],
                     };
                     this.bottomDivView = true;
@@ -1020,6 +960,7 @@ export default class EditJourneyView extends Vue {
                                 NodeId: this.useId[0].split('-')[1],
                                 NodeName: dragText,
                                 NodeType: "103",
+                                IsBestOffer: '0',
                                 Position: [
                                     {
                                         "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
@@ -1033,6 +974,7 @@ export default class EditJourneyView extends Vue {
                                 NodeId: this.useId[0].split('-')[1],
                                 NodeName: dragText,
                                 NodeType: "103",
+                                IsBestOffer: '0',
                                 Position: [],
                             };
                             this.bottomDivView = true;
@@ -1321,6 +1263,7 @@ export default class EditJourneyView extends Vue {
 
     checkBDivTitle(data: JourneyNodeModel | null): string {
         const typeValue: { [name: string]: string} = {
+            '201': 'POS COUPON',
             '207': '金卡升等-金續金',
             '208': '金卡升等-普升金',
             '209': '準金卡升等',

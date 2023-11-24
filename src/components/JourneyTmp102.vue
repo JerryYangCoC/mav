@@ -66,7 +66,7 @@
             
             <div style="display: flex; justify-content: flex-end;" v-if="isEdit">
                 <input type="button" class="btn" style="--i: url('/img/back.png')" @click="(() => {$router.push({path: 'journey', query: $router.currentRoute.value.query});})" value="返回" />
-                <input type="button" class="btn" style="--i: url('/img/editor.png')" @click="edit" value="修改" />
+                <input type="button" class="btn" style="--i: url('/img/editor.png')" @click="edit" value="修改" :disabled="dd.SendFlag == '1'" />
             </div>
 
             <div style="display: flex; justify-content: flex-end;" v-else>
@@ -313,15 +313,19 @@ export default class JourneyTmp102 extends Vue {
 
     onFile(event: any): void {
         this.value.VariableList = event.split('\n').splice(1).map((ver: any) => {
-            return {
-                VariableNo: ver.split(',')[0].replace(/\t/g, '').replace(/"/g, ''),
-                Param1: ver.split(',')[1],
-                Param2: ver.split(',')[2],
-                Param3: ver.split(',')[3],
-                Param4: ver.split(',')[4],
-                Param5: ver.split(',')[5].replace(/\r/g, ''),
+            if (ver.replace(/\r/g, '')) {
+                return {
+                    VariableNo: ver.split(',')[0].replace(/\t/g, '').replace(/"/g, ''),
+                    Param1: ver.split(',')[1],
+                    Param2: ver.split(',')[2],
+                    Param3: ver.split(',')[3],
+                    Param4: ver.split(',')[4],
+                    Param5: ver.split(',')[5].replace(/\r/g, ''),
+                }
             }
         });
+
+        this.value.VariableList = this.value.VariableList?.filter((v: any) => v != null)
     }
 
     onExportFile(): void {

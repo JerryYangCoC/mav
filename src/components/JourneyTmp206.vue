@@ -29,7 +29,7 @@
             
             <div style="display: flex; justify-content: flex-end;" v-if="isEdit">
                 <input type="button" class="btn" style="--i: url('/img/back.png')" @click="(() => {$router.push({path: 'journey', query: $router.currentRoute.value.query});})" value="返回" />
-                <input type="button" class="btn" style="--i: url('/img/editor.png')" @click="edit" value="修改" />
+                <input type="button" class="btn" style="--i: url('/img/editor.png')" @click="edit" value="修改" :disabled="dd.SendFlag == '1'" />
             </div>
 
             <div style="display: flex; justify-content: flex-end;" v-else>
@@ -180,7 +180,7 @@ export default class JourneyTmp206 extends Vue {
     }
 
     onFile(event: any): void {
-        // console.log(event)
+        // console.log(JSON.stringify(event))
         let itemList = event.split('\n').splice(1).map((ver: any) => {
             if (ver != '') {
                 return {
@@ -188,6 +188,7 @@ export default class JourneyTmp206 extends Vue {
                 }
             }
         });
+        itemList = itemList.filter((v: any) => v != null)
 
         store.dispatch('getJourneyGetSingleItem', {itemList})
     }

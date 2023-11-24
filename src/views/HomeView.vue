@@ -925,14 +925,26 @@ export default class HomeView extends Vue {
         });
 
         console.log(store.state.journey.journeyMapSample)
-        if (store.state.journey.journeyMapSample) this.journeyData = store.state.journey.journeyMapSample
+        if (store.state.journey.journeyMapSample) {
+            this.journeyData = store.state.journey.journeyMapSample
+            this.query.JourneyId = this.journeyData.JourneyId
+            this.query.JourneyName = this.journeyData.JourneyName
+            this.query.JourneyType = this.journeyData.JourneyType
+            this.query.StartDate = this.journeyData.StartDate
+            this.query.EndDate = this.journeyData.EndDate
+            this.query.StatusFlag = this.journeyData.StatusFlag
+        }
     }
 
     /**
      * 繪製旅程樹
      */
     createTree(): [{ [name: string]: any }] {
-        if (typeof this.journeyData.Content == 'string') this.journeyData.Content = JSON.parse(this.journeyData.Content)
+        if (typeof this.journeyData.Content == 'string') {
+            this.journeyData.Content = JSON.parse(this.journeyData.Content)
+            this.journeyData.JourneyType = this.journeyData.Content[0].NodeType.slice(1)
+            this.query.JourneyType = this.journeyData.JourneyType
+        }
         this.dataTree = this.journeyData.Content;
         let column = 1;
         let row = 1;
@@ -1924,6 +1936,7 @@ export default class HomeView extends Vue {
 
     checkBDivTitle(data: JourneyNodeModel | null): string {
         const typeValue: { [name: string]: string} = {
+            '201': 'POS COUPON',
             '207': '金卡升等-金續金',
             '208': '金卡升等-普升金',
             '209': '準金卡升等',

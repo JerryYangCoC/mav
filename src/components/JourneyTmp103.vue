@@ -47,7 +47,7 @@
 
             <div style="display: flex; justify-content: flex-end;" v-if="isEdit">
                 <input type="button" class="btn" style="--i: url('/img/back.png')" @click="(() => {$router.push({path: 'journey', query: $router.currentRoute.value.query});})" value="返回" />
-                <input type="button" class="btn" style="--i: url('/img/editor.png')" @click="edit" value="修改" />
+                <input type="button" class="btn" style="--i: url('/img/editor.png')" @click="edit" value="修改" :disabled="dd.SendFlag == '1'" />
             </div>
 
             <div style="display: flex; justify-content: flex-end;" v-else>
@@ -121,7 +121,6 @@ export default class JourneyTmp103 extends Vue {
                 break;
 
             case '2':
-                this.value.IsBestOffer = '';
                 $( function() {
                     $( "#StartYMD" ).datepicker({
                         dateFormat: "yy/mm/dd"
@@ -130,7 +129,6 @@ export default class JourneyTmp103 extends Vue {
                 break;
 
             default:
-                this.value.IsBestOffer = '';
                 break;
         }
     }
