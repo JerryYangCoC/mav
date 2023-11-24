@@ -3,7 +3,7 @@
       <span>文案製作作業 - 查詢</span>
     </div>
     <div>
-      <form @submit.prevent="onSearch()">
+      <form @submit.prevent="onSearch()" style="border: 1px solid #ccc;">
         <!-- 查詢條件 -->
         <div class="box-query">
           <div>
@@ -50,34 +50,28 @@
           <div>
             <span><span class="ask-red">*</span>期間：</span>
             <div>
-              <!-- <input style="width: 153px;" class="sd-text" type="date" max="9999-12-31" aria-required="false" aria-invalid="false" v-model="query.StartYMD" /> -->
-              <input type="text" id="StartYMD" @change="changeDate($event.target)" v-model="query.StartYMD" required />
+              <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="query.StartYMD" required />
               ～
-              <!-- <input style="width: 153px;" class="sd-text" type="date" max="9999-12-31" aria-required="false" aria-invalid="false" v-model="query.EndYMD" /> -->
-              <input type="text" id="EndYMD" @change="changeDate($event.target)" v-model="query.EndYMD" required />
+              <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="query.EndYMD" required />
+              <span class="ask-red" style="margin-left: 10px; margin-top: 10px; font-weight: bold; font-size: 14px;">(限查2年資料)</span>
             </div>
-            <span class="ask-red">限查2年資料</span>
           </div>
         </div>
 
         <div style="display: flex; justify-content: center; background-color: #f6f6f6;">
           <div style="padding: 12px 6px;">
-            <!-- <button class="btn" style="--i: url('/img/search.png')" @click="onSearch()">查詢</button> -->
             <input class="btn" style="--i: url('/img/search.png')" type="submit" value="查詢" />
           </div>
           
           <div style="padding: 12px 6px;">
-            <!-- <button class="btn" style="--i: url('/img/baseline_cleaning_services.png')" @click="init()">清除</button> -->
             <input class="btn" style="--i: url('/img/baseline_cleaning_services.png')" type="button" @click="init()" value="清除" />
           </div>
           
           <div style="padding: 12px 6px;">
-            <!-- <button class="btn" style="--i: url('/img/add.png'); width: 100px;" @click="onToAdd()">新增資料</button> -->
             <input class="btn" style="--i: url('/img/add.png'); width: 100px;" type="button" @click="onToAdd()" value="新增資料" />
           </div>
 
           <div style="padding: 12px 6px;">
-            <!-- <button class="btn" style="--i: url('/img/file_download.png'); width: 140px;">匯出EXCEL</button> -->
             <input class="btn" style="--i: url('/img/file_download.png'); width: 120px;" type="button" @click="onExportExcel()" value="匯出EXCEL" />
           </div>
         </div>
@@ -135,6 +129,7 @@ import { TreeNode } from 'primevue/tree';
 import { CopyListModel, CopyModel } from '@/model/copyList.model';
 import moment from 'moment';
 import * as XLSX from 'xlsx';
+import $ from 'jquery';
 
 @Options({
   components: {
@@ -159,6 +154,15 @@ export default class CopyView extends Vue {
    */
   created(): void {
     console.log('new copy page')
+
+    $( function() {
+        $( "#StartYMD" ).datepicker({
+            dateFormat: "yy/mm/dd"
+        });
+        $( "#EndYMD" ).datepicker({
+            dateFormat: "yy/mm/dd"
+        });
+    });
   }
 
   init(): void {
@@ -171,6 +175,8 @@ export default class CopyView extends Vue {
       EndYMD: '',
       message: ''
     }
+
+    store.commit('setCopy', [])
   }
 
   CopyList(): any {
@@ -181,10 +187,23 @@ export default class CopyView extends Vue {
     return value.replace(/\//g, '-')
   }
 
+    onStartYMD(): void {
+        setTimeout(() => {
+            this.query.StartYMD = (window.document.getElementById('StartYMD') as any).value
+        }, 300)
+    }
+
+    onEndYMD(): void {
+        setTimeout(() => {
+            this.query.EndYMD = (window.document.getElementById('EndYMD') as any).value
+        }, 300)
+    }
+
   /**
    * 查詢
    */
   onSearch(): void {
+    store.dispatch('upLoading', true)
     store.dispatch('getListCopy', this.query)
   }
 
@@ -200,13 +219,15 @@ export default class CopyView extends Vue {
    * 前往新增資料
    */
   onToAdd(): void {
-    this.$router.push({path: '/add', query: this.$router.currentRoute.value.query});
+    this.$router.push({path: 'copy/add', query: this.$router.currentRoute.value.query});
   }
 
   /**
    * 匯出Excel
    */
   onExportExcel(): void {
+    store.dispatch('upLoading', true)
+
     /* create a new blank workbook */
     let workbook = XLSX.utils.book_new();
     let worksheet = null
@@ -234,6 +255,10 @@ export default class CopyView extends Vue {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     var FileSaver = require('file-saver');
     FileSaver.saveAs(data1, "文案匯出");
+
+    setTimeout(() => {
+      store.dispatch('upLoading', false)
+    }, 300)
   }
 
   /**
@@ -241,6 +266,7 @@ export default class CopyView extends Vue {
    * @param value 日期Event
    */
   changeDate(value: any): void {
+        if(value.value == '') return;
     let date = value.value
     if (date?.length == 4) {
       date = moment(date, "MMDD").format('YYYY/MM/DD')
@@ -259,7 +285,7 @@ export default class CopyView extends Vue {
   }
 
   copyType(value: string): string {
-    const typeValue: any = {
+    const typeValue: { [name: string]: string } = {
       '01': '簡訊',
       '02': 'APP'
     }
@@ -268,7 +294,7 @@ export default class CopyView extends Vue {
   }
 
   journeyType(value: string): string {
-    const typeValue: any = {
+    const typeValue: { [name: string]: string } = {
       '01': '回券-POS COUPON',
       '02': '回券-精算抵用券',
       '03': '生日',
@@ -289,6 +315,7 @@ export default class CopyView extends Vue {
 .box-query {
   display: grid;
   grid-template-columns: 35% 65%;
+  padding: 1rem;
 
   > div {
     display: grid;

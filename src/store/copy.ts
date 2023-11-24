@@ -17,6 +17,9 @@ export const moduleCopy = {
                 }
             })
         },
+        removeCopy(state: any, data: CopyModel): void {
+            state.lists = state.lists.filter((ver: CopyListModel) => ver.data.CopyWriteID != data.CopyWriteID)
+        },
         setCopyList(state: any, data: any): void {
             state.copyList = data.map((v: CopyModel, i: number) => {
                 return {
@@ -27,8 +30,6 @@ export const moduleCopy = {
         },
         setCopyDetail(state: any, data: CopyModel[]): void {
             data?.forEach((v) => {
-                // v.StartYMD.replace(/\//g, '-')
-                // v.EndYMD.replace(/\//g, '-')
                 state.copyDetail = v
             });
         }
@@ -41,8 +42,10 @@ export const moduleCopy = {
                     if (res.status == 200 && res.data?.Status == '0') {
                         context.commit('setCopy', res.data?.CopyWrite_List)
                     }
+                    context.commit('setLoading', false)
                 }).catch((err) => {
                     console.log(err)
+                    context.commit('setLoading', false)
                 })
         },
         getCopy(context: any, data: CopyModel): void {
@@ -63,7 +66,7 @@ export const moduleCopy = {
                     if (res.status == 200 && res.data?.Status == '0') {
                         context.commit('setCopyDetail', res.data?.CopyWrite_List)
                         setTimeout(() => {
-                            router.push({path: '/edit', query: router.currentRoute.value.query})
+                            router.push({path: 'copy/edit', query: router.currentRoute.value.query})
                         }, 300)
                     }
                 }).catch((err) => {
@@ -71,11 +74,12 @@ export const moduleCopy = {
                 })
         },
         setCopy(context: any, data: CopyModel) {
-            // data.StartYMD = data.StartYMD.replace(/-/g, '/')
-            // data.EndYMD = data.EndYMD.replace(/-/g, '/')
             axios.post('http://10.2.126.194:8030/app/v1/api/CDP/CopyWriteImport', data)
                 .then((res) => {
                     console.log('set copy', res)
+                    if (res.status == 200 && res.data?.Status == '0' && data.FileType == '3') {
+                        context.commit('removeCopy', data)
+                    }
                 }).catch((err) => {
                     console.log(err)
                 })

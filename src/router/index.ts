@@ -27,13 +27,17 @@ const routes: Array<RouteRecordRaw> = [
       }
     ],
   },
-  // {
-  //   path: '/copy',
-  //   redirect: '/'
-  // },
   {
     path: '/copy/copy',
     redirect: '/copy'
+  },
+  {
+    path: '/copy/copy/add',
+    redirect: '/copy/add'
+  },
+  {
+    path: '/copy/copy/edit',
+    redirect: '/copy/edit'
   },
   {
     path: '/journey',
@@ -41,9 +45,31 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'journey',
+        component: () => import('../views/JourneyView.vue')
+      },
+      {
+        path: 'add',
+        name: 'addJourney',
         component: () => import('../views/HomeView.vue')
       },
+      {
+        path: 'edit',
+        name: 'editJourney',
+        component: () => import('../views/EditJourneyView.vue')
+      }
     ]
+  },
+  {
+    path: '/journey/journey',
+    redirect: '/journey',
+  },
+  {
+    path: '/journey/journey/add',
+    redirect: '/journey/add'
+  },
+  {
+    path: '/journey/journey/edit',
+    redirect: '/journey/edit'
   }
 ]
 
