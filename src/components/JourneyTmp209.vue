@@ -89,7 +89,7 @@ export default class JourneyTmp209 extends Vue {
     onYMD(): void {
         setTimeout(() => {
             this.value.SelectDate = (window.document.getElementById('YMD') as any).value
-        }, 300)
+        }, 150)
     }
 
     changeDate(value: any): void {

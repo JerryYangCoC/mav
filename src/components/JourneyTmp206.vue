@@ -104,13 +104,13 @@ export default class JourneyTmp206 extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.value.PayStartYMD = (window.document.getElementById('StartYMD') as any).value
-        }, 300)
+        }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.value.PayEndYMD = (window.document.getElementById('EndYMD') as any).value
-        }, 300)
+        }, 150)
     }
 
     changeDate(value: any): void {

@@ -67,7 +67,7 @@ export const moduleCopy = {
                         context.commit('setCopyDetail', res.data?.CopyWrite_List)
                         setTimeout(() => {
                             router.push({path: 'copy/edit', query: router.currentRoute.value.query})
-                        }, 300)
+                        }, 150)
                     }
                 }).catch((err) => {
                     console.log(err)

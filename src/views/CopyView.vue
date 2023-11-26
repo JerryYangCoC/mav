@@ -190,13 +190,13 @@ export default class CopyView extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.query.StartYMD = (window.document.getElementById('StartYMD') as any).value
-        }, 300)
+        }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.query.EndYMD = (window.document.getElementById('EndYMD') as any).value
-        }, 300)
+        }, 150)
     }
 
   /**
@@ -258,7 +258,7 @@ export default class CopyView extends Vue {
 
     setTimeout(() => {
       store.dispatch('upLoading', false)
-    }, 300)
+    }, 150)
   }
 
   /**

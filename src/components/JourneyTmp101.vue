@@ -75,8 +75,6 @@ export default class JourneyTmp101 extends Vue {
                 dateFormat: "yy/mm/dd"
             });
         });
-
-        console.log(this.dd)
     }
 
     changeDate(value: any): void {
@@ -106,13 +104,13 @@ export default class JourneyTmp101 extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.dd.StartDate = (window.document.getElementById('StartYMD') as any).value
-        }, 300)
+        }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.dd.EndDate = (window.document.getElementById('EndYMD') as any).value
-        }, 300)
+        }, 150)
     }
 }
 </script>

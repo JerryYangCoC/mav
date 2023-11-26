@@ -108,7 +108,7 @@ export const moduleJourney = {
                         context.commit('setJourneyDetail', res.data?.JourneyMap_List)
                         setTimeout(() => {
                             router.push({path: 'journey/edit', query: router.currentRoute.value.query})
-                        }, 300)
+                        }, 150)
                     }
                     context.commit('setLoading', false)
                 }).catch((err) => {
@@ -304,7 +304,7 @@ export const moduleJourney = {
                         context.commit('setJourneyMapSample', res.data?.JourneyMap_List)
                         setTimeout(() => {
                             router.push({path: 'journey/add', query: router.currentRoute.value.query})
-                        }, 300)
+                        }, 150)
                     }
                     context.commit('setLoading', false)
                 }).catch((err) => {

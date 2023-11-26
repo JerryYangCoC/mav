@@ -927,12 +927,13 @@ export default class HomeView extends Vue {
         console.log(store.state.journey.journeyMapSample)
         if (store.state.journey.journeyMapSample) {
             this.journeyData = store.state.journey.journeyMapSample
-            this.query.JourneyId = this.journeyData.JourneyId
-            this.query.JourneyName = this.journeyData.JourneyName
-            this.query.JourneyType = this.journeyData.JourneyType
-            this.query.StartDate = this.journeyData.StartDate
-            this.query.EndDate = this.journeyData.EndDate
-            this.query.StatusFlag = this.journeyData.StatusFlag
+            this.query.JourneyId = this.journeyData.JourneyId?.toString()
+            this.query.JourneyName = this.journeyData.JourneyName.toString()
+            this.query.JourneyType = this.journeyData.JourneyType.toString()
+            this.query.StartDate = this.journeyData.StartDate.toString()
+            this.query.EndDate = this.journeyData.EndDate.toString()
+            this.query.StatusFlag = this.journeyData.StatusFlag?.toString()
+            this.query.SendFlag = this.journeyData.SendFlag?.toString()
         }
     }
 
@@ -966,28 +967,6 @@ export default class HomeView extends Vue {
         return lists;
     }
 
-    // forTree(data: any, value: string, col: number, row: number): void {
-    //     for (const item of this.dataTree) {
-    //         if (item.NodeId == value) {
-    //             console.log('item', item)
-    //             data.push({value: this.category(item), data: item, column: col, row: row})
-    //             if (item.Position.length == 1) {
-    //                 if (item.NodeType != '105') data.push({value: this.ALine(), column: col + 1, row: row})
-    //             } else {
-    //                 let contentList = item.Position.map((v: PositionModel) => {
-    //                     return v.label
-    //                 })
-    //                 data.push({value: this.BLine(contentList), column: col + 1, row: row})
-    //             }
-
-    //             col += 2;
-
-    //             item.Position.forEach((ip: PositionModel, i: number) => {
-    //                 this.forTree(data, ip.target.toString(), col, row + i)
-    //             })
-    //         }
-    //     }
-    // }
     forTree(data: any, value: string, col: number, row: number, n: number, cnt: number, ctl: Array<string>): void {
         for (const item of this.dataTree) {
             if (item.NodeId == value) {
@@ -999,7 +978,7 @@ export default class HomeView extends Vue {
                 
                 if (item.Position.length == 1) {
                     if (item.NodeType != '105') {
-                        data.push({value: this.ALine(), column: col + 1, row: this.row})
+                        data.push({value: this.CLine(item.Position[0].label), column: col + 1, row: this.row})
                         if (this.useId.length > 0 && item.NodeId == this.useId[0].split('-')[0]) {
                             data.push({value: this.Dbtn(), column: col + 2, row: this.row})
                         }

@@ -296,7 +296,7 @@ export default class JourneyView extends Vue {
                                     // 成功
                                     setTimeout(() => {
                                         this.onSearch()
-                                    }, 300)
+                                    }, 150)
                                     break;
 
                                 case '1':
@@ -351,7 +351,7 @@ export default class JourneyView extends Vue {
 
         setTimeout(() => {
             store.dispatch('upLoading', false)
-        }, 300)
+        }, 150)
     }
 
     /**
@@ -371,13 +371,13 @@ export default class JourneyView extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.query.StartDate = (window.document.getElementById('StartYMD') as any).value
-        }, 300)
+        }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.query.EndDate = (window.document.getElementById('EndYMD') as any).value
-        }, 300)
+        }, 150)
     }
 
     /**

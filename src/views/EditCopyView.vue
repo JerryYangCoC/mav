@@ -260,7 +260,7 @@ export default class EditCopyView extends Vue {
                 store.dispatch('setCopy', this.copyData)
                 setTimeout(() => {
                     this.onToList();
-                }, 300)
+                }, 150)
             }
         });
     }
@@ -351,13 +351,13 @@ export default class EditCopyView extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.copyData.StartYMD = (window.document.getElementById('StartYMD') as any).value
-        }, 300)
+        }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.copyData.EndYMD = (window.document.getElementById('EndYMD') as any).value
-        }, 300)
+        }, 150)
     }
 
     /**

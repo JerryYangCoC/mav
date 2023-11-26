@@ -3,7 +3,7 @@
         <form @submit.prevent="onClick()">
             <div style="display: grid; grid-template-columns: 160px auto auto auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>名單匯入：</span>
-                <input type="file" style="width: 300px;" @change="previewFiles($event, onFile)" accept=".csv" required v-if="!isEdit" />
+                <input type="file" style="width: 300px;" @change="previewFiles($event, onFile)" accept=".csv" :required="gidList().length == 0" v-if="!isEdit" />
                 <input type="button" class="btn-white" style="--i: url('/img/more_horiz.svg'); width: 40px;" @click="queryView = true;" /> 
                 <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportFile" value="範例檔案" v-if="!isEdit" />
             </div>

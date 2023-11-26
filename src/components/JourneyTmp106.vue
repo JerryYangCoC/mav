@@ -24,8 +24,8 @@
                     <span>參數上傳：</span>
                     <!-- <input type="text" style="width: 300px;" v-model="dd.JourneyName" required /> -->
                     <div style="display: flex;" v-if="dd.JourneyType == '01' || dd.JourneyType == '02' || dd.JourneyType == '06'">
-                        <input type="file" style="width: 300px;" @change="previewFiles($event, onFile)" accept=".csv" v-if="!isEdit" />
-                        <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportFile" value="範例檔案" v-if="!isEdit" />
+                        <input type="file" style="width: 300px;" @change="previewFiles($event, onFile)" accept=".csv" :disabled="isEdit" />
+                        <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportFile" value="範例檔案" :disabled="isEdit" />
                     </div>
 
                 </div>
@@ -192,7 +192,7 @@ export default class JourneyTmp106 extends Vue {
                 // eslint-disable-next-line no-case-declarations
                 this.fileData = this.dd.Content[0].ProductList?.map((v: ProductModel) => {
                     return {
-                        ItemCode: v.ItemCode + '\t'
+                        ItemCode: v.itemCode + '\t'
                     }
                 })
                 this.fileTitle = 'ItemCode'
@@ -241,6 +241,16 @@ export default class JourneyTmp106 extends Vue {
             Import: null,
             ActivityType: null,
             ActivityList: null,
+            DateType: null,
+            PayAmtStart: null,
+            PayAmtEnd: null,
+            JudgeType: null,
+            ConsumeStartYMD: null,
+            ConsumeEndYMD: null,
+            GoldSelectDate: null,
+            RemindedStartYMD: null,
+            RemindedEndYMD: null,
+            BirthSelectmonth: null,
         }
 
         if (this.value.NodeSeq && this.value.NodeSeq?.split('-').length > 2) {
@@ -251,14 +261,41 @@ export default class JourneyTmp106 extends Vue {
             this.dd.Content.forEach((ver: JourneyNodeModel) => {
                 if (ver.NodeSeq && ver.NodeSeq == seq) {
                     let select = this.dd.Content.filter((v: JourneyNodeModel) => v.NodeId == ver.Position[0].target)
+                    console.log('select', select[0])
                     if (select.length > 0) {
                         data.SendType = select[0].SendType
                         data.SelectTime = select[0].SelectTime
                         data.SendTime = select[0].SendTime
                         data.IsBestOffer = select[0].IsBestOffer
                     }
+
+                    if (this.dd.JourneyType != '05' && this.dd.JourneyType != '07' && this.dd.JourneyType != '08') {
+                        let select2 = this.dd.Content.filter((v: JourneyNodeModel) => v.NodeId == select[0].Position[0].target)
+                        console.log('select2', select2[0])
+                        if (select2.length > 0 && select2[0].NodeType == '107') {
+                            data.JudgeType = select2[0].JudgeType
+                            data.ConsumeStartYMD = select2[0]?.ConsumeStartYMD
+                            data.ConsumeEndYMD = select2[0]?.ConsumeEndYMD
+                            data.GoldSelectDate = select2[0]?.GoldSelectDate
+                            data.RemindedStartYMD = select2[0]?.RemindedStartYMD
+                            data.RemindedEndYMD = select2[0]?.RemindedEndYMD
+                            data.BirthSelectmonth = select2[0]?.BirthSelectmonth
+                        }
+                    }
                 }
             })
+        } else {
+            if (this.dd.JourneyType != '05' && this.dd.JourneyType != '07' && this.dd.JourneyType != '08') {
+                if (this.dd.Content[2].NodeType == '107') {
+                    data.JudgeType = this.dd.Content[2].JudgeType
+                    data.ConsumeStartYMD = this.dd.Content[2]?.ConsumeStartYMD
+                    data.ConsumeEndYMD = this.dd.Content[2]?.ConsumeEndYMD
+                    data.GoldSelectDate = this.dd.Content[2]?.GoldSelectDate
+                    data.RemindedStartYMD = this.dd.Content[2]?.RemindedStartYMD
+                    data.RemindedEndYMD = this.dd.Content[2]?.RemindedEndYMD
+                    data.BirthSelectmonth = this.dd.Content[2]?.BirthSelectmonth
+                }
+            }
         }
 
         switch(this.dd.JourneyType) {
@@ -273,7 +310,13 @@ export default class JourneyTmp106 extends Vue {
             case '03':
             case '07':
             case '08':
+                data.SelectDate = this.dd.Content[0].SelectDate
+                break;
+
             case '09':
+                data.DateType = this.dd.Content[0].DateType
+                data.PayAmtStart = this.dd.Content[0].PayAmtStart
+                data.PayAmtEnd = this.dd.Content[0].PayAmtEnd
                 data.SelectDate = this.dd.Content[0].SelectDate
                 break;
 

@@ -397,7 +397,11 @@ export default class EditJourneyView extends Vue {
             JourneyType: this.journeyData.JourneyType.toString(),
             StartDate: this.journeyData.StartDate.toString(),
             EndDate: this.journeyData.EndDate.toString(),
-            StatusFlag: this.journeyData.StatusFlag?.toString()
+            StatusFlag: this.journeyData.StatusFlag?.toString(),
+            SendFlag: this.journeyData.SendFlag?.toString(),
+        }
+        if (this.journeyData.JourneyType == '10') {
+            this.importType = this.journeyData.Content[0].ActivityType
         }
     }
 
@@ -436,7 +440,7 @@ export default class EditJourneyView extends Vue {
                 
                 if (item.Position.length == 1) {
                     if (item.NodeType != '105') {
-                        data.push({value: this.ALine(), column: col + 1, row: this.row})
+                        data.push({value: this.CLine(item.Position[0].label), column: col + 1, row: this.row})
                     } else {
                         // n--;
                     }

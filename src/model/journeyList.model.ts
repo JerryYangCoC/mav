@@ -439,6 +439,7 @@ export interface ProductModel {
      * 商品ID
      */
     ItemCode: string,
+    itemCode?: string,
 
     /**
      * 商品名稱
@@ -449,4 +450,5 @@ export interface ProductModel {
      * 商品名稱
      */
     ItemName: string,
+    itemName?: string,
 }

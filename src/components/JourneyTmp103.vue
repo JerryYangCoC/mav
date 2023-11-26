@@ -136,7 +136,7 @@ export default class JourneyTmp103 extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.value.SelectTime = (window.document.getElementById('StartYMD') as any).value
-        }, 300)
+        }, 150)
     }
 }
 </script>
