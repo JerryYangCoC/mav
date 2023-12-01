@@ -13,7 +13,7 @@
                         <span>號</span>
                     </div>
                     <div v-if="value.DateType == '1'">
-                        <input type="text" id="YMD" style="width: 150px;" @change="changeDate($event.target)" @blur="onYMD()" v-model="value.SelectDate" required :disabled="isEdit" />
+                        <input type="text" id="YMD" style="width: 150px;" @change="changeDate($event.target)" @blur="onYMD()" v-model="value.SelectDate" autocomplete="no-autofill" required :disabled="isEdit" />
                     </div>
                 </div>
             </div>
@@ -47,6 +47,7 @@ import { Options, Vue } from 'vue-class-component';
 import { JourneyModel, JourneyNodeModel } from '@/model/journeyList.model';
 import moment from 'moment';
 import $ from 'jquery';
+import store from '@/store';
 
 /**
  * 準金卡
@@ -75,6 +76,14 @@ export default class JourneyTmp209 extends Vue {
                 dateFormat: "yy/mm/dd"
             });
         });
+
+        setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#YMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
     }
 
     onClick(): void {
@@ -89,6 +98,7 @@ export default class JourneyTmp209 extends Vue {
     onYMD(): void {
         setTimeout(() => {
             this.value.SelectDate = (window.document.getElementById('YMD') as any).value
+            // $( "#YMD" ).datepicker( "hide" );
         }, 150)
     }
 
@@ -105,7 +115,8 @@ export default class JourneyTmp209 extends Vue {
       
       if (date == 'Invalid date' || date?.length != 10) {
           date = ''
-          alert('日期格式錯誤')
+        //   alert('日期格式錯誤')
+        store.commit('setErrorMessage', '日期格式錯誤')
       }
       
       return this.value.SelectDate = date

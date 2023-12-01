@@ -27,9 +27,9 @@
                 <div>
                     <span><span class="ask-red">*</span>期間：</span>
                     <div>
-                        <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="query.StartDate" required />
+                        <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="query.StartDate" autocomplete="no-autofill" required />
                         ～
-                        <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="query.EndDate" required />
+                        <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="query.EndDate" autocomplete="no-autofill" required />
                     </div>
                 </div>
 
@@ -195,7 +195,7 @@
             <input type="button" class="btn" style="--i: url('/img/back.png')" @click="addView = false" value="返回" />
         </div>
     </Dialog>
-    <ConfirmDialog></ConfirmDialog>
+    <ConfirmDialog :closable="false"></ConfirmDialog>
 </template>
 
 <script lang="ts">
@@ -238,6 +238,16 @@ export default class JourneyView extends Vue {
             });
         });
 
+
+        setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#StartYMD" ).datepicker( "hide" );
+                    $( "#EndYMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
+        
         store.commit('setJourneyMapSample', null)
     }
 
@@ -294,14 +304,16 @@ export default class JourneyView extends Vue {
                             switch(res.data?.Status) {
                                 case '0':
                                     // 成功
+                                    store.commit('setErrorMessage', '刪除成功')
                                     setTimeout(() => {
                                         this.onSearch()
-                                    }, 150)
+                                    }, 100)
                                     break;
 
                                 case '1':
                                     // 失敗
-                                    alert(res.data?.Message);
+                                    // alert(res.data?.Message);
+                                    store.commit('setErrorMessage', res.data?.Message)
                                     store.dispatch('upSess')
                                     break;
 
@@ -328,7 +340,7 @@ export default class JourneyView extends Vue {
         let worksheet = null
         let data = this.JourneyList().map((res: JourneyListModel) => {
             return {
-                JourneyType: res.data.JourneyType + '_' + this.journeyType(res.data.JourneyType),
+                JourneyType: res.data.JourneyType + '_' + this.journeyType(res.data.JourneyType ?? ''),
                 JourneyId: res.data.JourneyId,
                 JourneyName: res.data.JourneyName,
                 StartYMD: res.data.StartYMD,
@@ -351,7 +363,7 @@ export default class JourneyView extends Vue {
 
         setTimeout(() => {
             store.dispatch('upLoading', false)
-        }, 150)
+        }, 100)
     }
 
     /**
@@ -371,12 +383,14 @@ export default class JourneyView extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.query.StartDate = (window.document.getElementById('StartYMD') as any).value
+            // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.query.EndDate = (window.document.getElementById('EndYMD') as any).value
+            // $( "#EndYMD" ).datepicker( "hide" );
         }, 150)
     }
 
@@ -397,7 +411,8 @@ export default class JourneyView extends Vue {
     
         if (date == 'Invalid date' || date?.length != 10) {
             date = ''
-            alert('日期格式錯誤')
+            // alert('日期格式錯誤')
+            store.commit('setErrorMessage', '日期格式錯誤')
         }
     
         value.id == 'StartYMD' ? this.query.StartDate = date : this.query.EndDate = date

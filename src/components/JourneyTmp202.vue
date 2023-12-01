@@ -58,6 +58,7 @@
                     :value="copList()"
                     tableStyle="min-width: 20rem; border: 1px solid #ccc;"
                     v-model:selection="selectedProduct"
+                    dataKey="CopCode"
                 >
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
                     <Column field="CopCode" header="編號"></Column>

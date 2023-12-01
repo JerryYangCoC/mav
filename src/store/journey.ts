@@ -108,7 +108,7 @@ export const moduleJourney = {
                         context.commit('setJourneyDetail', res.data?.JourneyMap_List)
                         setTimeout(() => {
                             router.push({path: 'journey/edit', query: router.currentRoute.value.query})
-                        }, 150)
+                        }, 100)
                     }
                     context.commit('setLoading', false)
                 }).catch((err) => {
@@ -304,14 +304,53 @@ export const moduleJourney = {
                         context.commit('setJourneyMapSample', res.data?.JourneyMap_List)
                         setTimeout(() => {
                             router.push({path: 'journey/add', query: router.currentRoute.value.query})
-                        }, 150)
+                        }, 100)
                     }
                     context.commit('setLoading', false)
                 }).catch((err) => {
                     console.log(err)
                     context.commit('setLoading', false)
                 })
-        }
+        },
+        getJourneyCheckGID(context: any, data: string): void {
+            // axios.post('http://10.2.126.194:8030/app/v1/api/CDP/JourneyCheckGID', { GID_List: data })
+            //     .then((res) => {
+            //         console.log(res)
+            //         // if (res.status == 200 && res.data?.Status == '0') {
+
+            //         // }
+            //         context.commit('setLoading', false)
+            //     }).catch((err) => {
+            //         console.log(err)
+            //         context.commit('setLoading', false)
+            //     })
+            axios.post("http://10.2.126.194:8030/app/v1/api/CDP/JourneyCheckGID", { GID_List: data }, { responseType: 'blob' })
+                .then((res: any) => {
+                    console.log(res)
+                    if (res.status == 200) {
+                        if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) { // IE variant
+                            (window.navigator as any).msSaveOrOpenBlob(new Blob([res.data],
+                                    { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+                                ),
+                                'GID匯出檔案.csv'
+                            );
+                        } else {
+                            const url = window.URL.createObjectURL(new Blob([res.data],
+                                { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', 'GID匯出檔案.csv');
+                            document.body.appendChild(link);
+                            link.click();
+                        }
+                    }
+                    context.commit('setLoading', false)
+                }).catch((err) => {
+                    console.log(err)
+                    context.commit('setLoading', false)
+                })
+            
+        },
 
     },
 }

@@ -4,9 +4,9 @@
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>新入會期間：</span>
                 <div>
-                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.NewMemStartYMD" required :disabled="isEdit" />
+                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.NewMemStartYMD" autocomplete="no-autofill" required :disabled="isEdit" />
                     ～
-                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.NewMemEndYMD" required :disabled="isEdit" />
+                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.NewMemEndYMD" autocomplete="no-autofill" required :disabled="isEdit" />
                 </div>
             </div>
             
@@ -29,6 +29,7 @@ import { Options, Vue } from 'vue-class-component';
 import { JourneyModel, JourneyNodeModel } from '@/model/journeyList.model';
 import moment from 'moment';
 import $ from 'jquery';
+import store from '@/store';
 
 /**
  * 新會員活動
@@ -60,17 +61,28 @@ export default class JourneyTmp204 extends Vue {
                 dateFormat: "yy/mm/dd"
             });
         });
+
+        setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#StartYMD" ).datepicker( "hide" );
+                    $( "#EndYMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
     }
 
     onStartYMD(): void {
         setTimeout(() => {
             this.value.NewMemStartYMD = (window.document.getElementById('StartYMD') as any).value
+            // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.value.NewMemEndYMD = (window.document.getElementById('EndYMD') as any).value
+            // $( "#EndYMD" ).datepicker( "hide" );
         }, 150)
     }
 
@@ -87,7 +99,8 @@ export default class JourneyTmp204 extends Vue {
       
       if (date == 'Invalid date' || date?.length != 10) {
           date = ''
-          alert('日期格式錯誤')
+        //   alert('日期格式錯誤')
+        store.commit('setErrorMessage', '日期格式錯誤')
       }
       
       return value.id == 'StartYMD' ? this.value.NewMemStartYMD = date : this.value.NewMemEndYMD = date

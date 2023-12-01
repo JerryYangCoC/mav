@@ -18,7 +18,7 @@ export interface JourneyModel {
     /**
      * 旅程型態
      */
-    JourneyType: string,
+    JourneyType?: string,
 
     /**
      * 有效起日

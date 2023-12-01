@@ -8,7 +8,7 @@
             <!-- 內頁 -->
             <div :class="'l-div'">
                 <!-- 左方塊 -->
-                <div class="tree" @dragover="allowDrop" @drop="dropTrigger($event)">
+                <div :style="journeyData?.Content?.length < 15 ? 'padding-right: 80vw;' : ''" class="tree" @dragover="allowDrop" @drop="dropTrigger($event)">
                     <!-- 旅程樹 -->
                     <div v-for="(item, index) of createTree()" :key="index" :style="{'grid-column-start': item.column, 'grid-row-start': item.row}">
                         <div v-html="item.value" @click="(() => { bottomDivView = true; selectContent = item?.data; })"></div>
@@ -32,6 +32,7 @@
                                         <input type="button" class="btn" style="--i: url('/img/back.png')" @click="(() => {
                                             $router.push({path: 'journey', query: $router.currentRoute.value.query});
                                         })" value="返回" />
+                                        <input type="button" class="btn" style="--i: url('/img/delete.png')" @click="(() => {onRemove()})" value="刪除" />
                                         <input type="button" class="btn" style="--i: url('/img/sent.png'); width: 100px;" @click="onCreate()" value="資料送出" />
                                     </div>
                                 </div>
@@ -42,7 +43,6 @@
                                     journeyData.StatusFlag = query.StatusFlag
                                     selectContent = null;
                                     bottomDivView = false;
-                                    isEdit = true
                                     })" v-if="selectContent?.NodeType == '101'"></JourneyTmp101>
                                 <JourneyTmp102 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
@@ -68,11 +68,10 @@
                                                 ver.IsBestOffer = selectContent.IsBestOffer
                                                 selectContent = null
                                                 bottomDivView = false
-                                                isEdit = true
                                                 return
                                             }
                                         })
-                                    })" v-if="selectContent?.NodeType == '103'"></JourneyTmp103>
+                                    })" :remove="(() => {onRemove()})"  v-if="selectContent?.NodeType == '103'"></JourneyTmp103>
                                 <JourneyTmp104 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
@@ -115,15 +114,333 @@
                                                 ver.BirthSelectmonth = selectContent.BirthSelectmonth
                                                 selectContent = null;
                                                 bottomDivView = false;
-                                                isEdit = true
                                                 return
                                             }
                                         });
-                                    })" :value="selectContent" v-if="selectContent?.NodeType == '107'"></JourneyTmp107>
+                                    })" :remove="(() => {onRemove()})"  :value="selectContent" v-if="selectContent?.NodeType == '107'"></JourneyTmp107>
                                 <JourneyTmp108 :isEdit="isEdit" :dd="journeyData" :value="selectContent" :active="(() => { 
-                                    selectContent = null;
-                                    bottomDivView = false;
-                                    return;
+                                    dataTree.forEach((ver: JourneyNodeModel) => {
+                                        if (ver.NodeId == selectContent?.NodeId) {
+                                            let p = new Array<string>()
+                                            ver.Position.forEach((v: PositionModel) => {
+                                                p.push(v.label)
+                                            })
+                                            let chaLabel: { [name: string]: string} = {
+                                                0: '有APP',
+                                                1: '無APP',
+                                                2: '有簡訊',
+                                                3: '無簡訊',
+                                                4: '有EDM',
+                                                5: '無EDM',
+                                            }
+                                            let chaType: { [name: string]: string} = {
+                                                0: '104',
+                                                1: '109',
+                                                2: '106',
+                                                3: '111',
+                                                4: '102',
+                                                5: '110',
+                                            }
+                                            if (ver.Position.length == 0) {
+                                                let cl = 0
+                                                selectContent.Channel?.split('0').forEach((v) => {
+                                                    cl += v.length;
+                                                })
+                                                let seqI = 1;
+                                                let seqNum = '1';
+                                                if (seqList.length > 0) {
+                                                    seqNum = seqList[0]
+                                                    seqList = seqList.filter(v => v != seqNum)
+                                                }
+                                                ver.Channel = selectContent.Channel
+                                                selectContent.Channel?.split('').forEach((v: string, index: number) => {
+                                                    const tId = (endId + cl).toString()
+                                                    if (v == '1') {
+                                                        switch (index) {
+                                                            case 0:
+                                                                ver.Position.push({
+                                                                    SeqId: 'e' + ver.NodeId + '-' + endId.toString(),
+                                                                    source: ver.NodeId,
+                                                                    target: endId.toString(),
+                                                                    label: '有APP'
+                                                                })
+                                                                journeyData.Content.push({
+                                                                    NodeId: endId.toString(),
+                                                                    NodeName: 'APP',
+                                                                    NodeType: '104',
+                                                                    NodeSeq: seqNum + '-' + seqI.toString(),
+                                                                    // NodeSeq: seqNum + '-' + (index + 1).toString(),
+                                                                    SendType: '0',
+                                                                    PeopleLimt: '0',
+                                                                    RemindedDate: '0',
+                                                                    IsRecvMsgFlag: '0',
+                                                                    Position: [
+                                                                        {
+                                                                            SeqId: 'e' + endId + '-' + tId,
+                                                                            source: endId.toString(),
+                                                                            target: tId,
+                                                                            label: ''
+                                                                        }
+                                                                    ],
+                                                                });
+                                                                useId.push(endId.toString() + '-' + tId);
+                                                                endId ++;
+                                                                seqList.push(seqNum + '-' + seqI.toString())
+                                                                // seqList.push(seqNum + '-' + (index + 1).toString())
+                                                                seqI++;
+                                                                break;
+                                                        
+                                                            case 1:
+                                                                ver.Position.push({
+                                                                    SeqId: 'e' + ver.NodeId + '-' + endId.toString(),
+                                                                    source: ver.NodeId,
+                                                                    target: endId.toString(),
+                                                                    label: '無APP'
+                                                                })
+                                                                journeyData.Content.push({
+                                                                    NodeId: endId.toString(),
+                                                                    NodeName: '無APP',
+                                                                    NodeType: '109',
+                                                                    NodeSeq: seqNum + '-' + seqI.toString(),
+                                                                    // NodeSeq: seqNum + '-' + (index + 1).toString(),
+                                                                    Position: [
+                                                                        {
+                                                                            SeqId: 'e' + endId + '-' + tId,
+                                                                            source: endId.toString(),
+                                                                            target: tId,
+                                                                            label: ''
+                                                                        }
+                                                                    ],
+                                                                });
+                                                                useId.push(endId.toString() + '-' + tId);
+                                                                endId ++;
+                                                                seqList.push(seqNum + '-' + seqI.toString())
+                                                                // seqList.push(seqNum + '-' + (index + 1).toString())
+                                                                seqI++;
+                                                                break;
+                                                        
+                                                            case 2:
+                                                                ver.Position.push({
+                                                                    SeqId: 'e' + ver.NodeId + '-' + endId.toString(),
+                                                                    source: ver.NodeId,
+                                                                    target: endId.toString(),
+                                                                    label: '有簡訊'
+                                                                })
+                                                                journeyData.Content.push({
+                                                                    NodeId: endId.toString(),
+                                                                    NodeName: '簡訊',
+                                                                    NodeType: '106',
+                                                                    NodeSeq: seqNum + '-' + seqI.toString(),
+                                                                    // NodeSeq: seqNum + '-' + (index + 1).toString(),
+                                                                    SendType: '0',
+                                                                    PeopleLimt: '0',
+                                                                    RemindedDate: '0',
+                                                                    IsRecvMsgFlag: '0',
+                                                                    Position: [
+                                                                        {
+                                                                            SeqId: 'e' + endId.toString() + '-' + tId,
+                                                                            source: endId.toString(),
+                                                                            target: tId,
+                                                                            label: ''
+                                                                        }
+                                                                    ],
+                                                                });
+                                                                useId.push(endId.toString() + '-' + tId);
+                                                                endId ++;
+                                                                seqList.push(seqNum + '-' + seqI.toString())
+                                                                // seqList.push(seqNum + '-' + (index + 1).toString())
+                                                                seqI++;
+                                                                break;
+                                                        
+                                                            case 3:
+                                                                ver.Position.push({
+                                                                    SeqId: 'e' + ver.NodeId + '-' + endId.toString(),
+                                                                    source: ver.NodeId,
+                                                                    target: endId.toString(),
+                                                                    label: '無簡訊'
+                                                                })
+                                                                journeyData.Content.push({
+                                                                    NodeId: endId.toString(),
+                                                                    NodeName: '無簡訊',
+                                                                    NodeType: '111',
+                                                                    NodeSeq: seqNum + '-' + seqI.toString(),
+                                                                    // NodeSeq: seqNum + '-' + (index + 1).toString(),
+                                                                    Position: [
+                                                                        {
+                                                                            SeqId: 'e' + endId.toString() + '-' + tId,
+                                                                            source: endId.toString(),
+                                                                            target: tId,
+                                                                            label: ''
+                                                                        }
+                                                                    ],
+                                                                });
+                                                                useId.push(endId.toString() + '-' + tId);
+                                                                endId ++;
+                                                                seqList.push(seqNum + '-' + seqI.toString())
+                                                                // seqList.push(seqNum + '-' + (index + 1).toString())
+                                                                seqI++;
+                                                                break;
+                                                        
+                                                            case 4:
+                                                                ver.Position.push({
+                                                                    SeqId: 'e' + ver.NodeId + '-' + endId.toString(),
+                                                                    source: ver.NodeId,
+                                                                    target: endId.toString(),
+                                                                    label: '有EDM'
+                                                                })
+                                                                journeyData.Content.push({
+                                                                    NodeId: endId.toString(),
+                                                                    NodeName: 'EDM',
+                                                                    NodeType: '102',
+                                                                    SendType: '0',
+                                                                    PeopleLimt: '0',
+                                                                    RemindedDate: '0',
+                                                                    IsRecvMsgFlag: '0',
+                                                                    NodeSeq: seqNum + '-' + seqI.toString(),
+                                                                    // NodeSeq: seqNum + '-' + (index + 1).toString(),
+                                                                    Position: [
+                                                                        {
+                                                                            SeqId: 'e' + endId.toString() + '-' + tId,
+                                                                            source: endId.toString(),
+                                                                            target: tId,
+                                                                            label: ''
+                                                                        }
+                                                                    ],
+                                                                });
+                                                                useId.push(endId.toString() + '-' + tId);
+                                                                endId ++;
+                                                                seqList.push(seqNum + '-' + seqI.toString())
+                                                                // seqList.push(seqNum + '-' + (index + 1).toString())
+                                                                seqI++;
+                                                                break;
+                                                        
+                                                            case 5:
+                                                                ver.Position.push({
+                                                                    SeqId: 'e' + ver.NodeId + '-' + endId.toString(),
+                                                                    source: ver.NodeId,
+                                                                    target: endId.toString(),
+                                                                    label: '無EDM'
+                                                                })
+                                                                journeyData.Content.push({
+                                                                    NodeId: endId.toString(),
+                                                                    NodeName: '無EDM',
+                                                                    NodeType: '110',
+                                                                    NodeSeq: seqNum + '-' + seqI.toString(),
+                                                                    // NodeSeq: seqNum + '-' + (index + 1).toString(),
+                                                                    Position: [
+                                                                        {
+                                                                            SeqId: 'e' + endId.toString() + '-' + tId,
+                                                                            source: endId.toString(),
+                                                                            target: tId,
+                                                                            label: ''
+                                                                        }
+                                                                    ],
+                                                                });
+                                                                useId.push(endId.toString() + '-' + tId);
+                                                                endId ++;
+                                                                seqList.push(seqNum + '-' + seqI.toString())
+                                                                // seqList.push(seqNum + '-' + (index + 1).toString())
+                                                                seqI++;
+                                                                break;
+                                                        
+                                                            default:
+                                                                break;
+                                                        }
+                                                        // endId += cl;
+                                                    }
+                                                })
+                                                endId += cl;
+
+                                            } else {
+                                                let seqNum = '1'
+                                                let seqI = 1
+                                                dataTree.forEach((j: JourneyNodeModel) => {
+                                                    if (j.NodeId == ver.Position[ver.Position.length - 1].target.toString()) {
+                                                        let seq = j.NodeSeq?.split('-') ?? ['1']
+                                                        let seqE = seq[seq.length - 1] ?? '1'
+                                                        seqI += Number(seqE)
+
+                                                        seqNum = j.NodeSeq?.slice(0, j.NodeSeq.length - seqE.length - 1) ?? ''
+                                                    }
+                                                })
+                                                selectContent?.Channel?.split('').forEach((v: string, i: number) => {
+                                                    if (v == '0') {
+                                                        if (p.includes(chaLabel[i])) {
+                                                            ver.Position.forEach((vp: PositionModel, pi: number) => {
+                                                                if (vp.label == chaLabel[i]) {
+                                                                    removeNode(vp.target.toString())
+                                                                    ver.Position.splice(pi, 1)
+                                                                }
+                                                            })
+                                                        }
+                                                    } else {
+                                                        if (!p.includes(chaLabel[i])) {
+                                                            ver.Position.push({
+                                                                SeqId: 'e' + ver.NodeId + '-' + endId.toString(),
+                                                                source: ver.NodeId,
+                                                                target: endId.toString(),
+                                                                label: chaLabel[i]
+                                                            })
+                                                            journeyData.Content.push({
+                                                                NodeId: endId.toString(),
+                                                                NodeName: chaLabel[i],
+                                                                NodeType: chaType[i],
+                                                                // NodeSeq: seqNum + '-' + (i + 1).toString(),
+                                                                NodeSeq: seqNum + '-' + seqI,
+                                                                SendType: '0',
+                                                                PeopleLimt: '0',
+                                                                RemindedDate: '0',
+                                                                IsRecvMsgFlag: '0',
+                                                                Position: [
+                                                                    {
+                                                                        SeqId: 'e' + endId + '-' + (endId+1).toString(),
+                                                                        source: endId.toString(),
+                                                                        target: endId+1,
+                                                                        label: ''
+                                                                    }
+                                                                ],
+                                                            });
+                                                            useId.push(endId.toString() + '-' + (endId+1).toString());
+                                                            endId+= 2;
+                                                            // seqList.push(seqNum + '-' + (i + 1).toString())
+                                                            seqList.push(seqNum + '-' + seqI.toString())
+                                                            seqI++ ;
+                                                        }
+                                                    }
+
+                                                });
+                                            }
+                                            selectContent = null;
+                                            bottomDivView = false;
+                                            return
+                                        }
+                                    });
+                                })" :remove="(() => {
+                                    confirm.require({
+                                        message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                        header: '確認',
+                                        acceptClass: 'p-button-danger',
+                                        acceptLabel: '取消',
+                                        rejectLabel: '確認',
+                                        reject: () => {
+                                            dataTree.forEach((ver: JourneyNodeModel) => {
+                                                if (ver.NodeId == selectContent?.NodeId) {
+                                                    let seqNum = '1'
+                                                    dataTree.forEach((j: JourneyNodeModel) => {
+                                                        if (j.NodeId == ver.Position[ver.Position.length - 1].target.toString()) {
+                                                            let seq = j.NodeSeq?.split('-') ?? ['1']
+                                                            let seqE = seq[seq.length - 1] ?? '1'
+
+                                                            seqNum = j.NodeSeq?.slice(0, j.NodeSeq.length - seqE.length - 1) ?? ''
+                                                        }
+                                                    })
+
+                                                    seqList = [seqNum, ...seqList]
+                                                    remove()
+                                                }
+                                            })
+                                        }
+                                    });
                                 })" v-if="selectContent?.NodeType == '108'"></JourneyTmp108>
                                 <JourneyTmp201 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
@@ -131,19 +448,46 @@
                                             ver.CouponList = selectContent.CouponList
                                             selectContent = null;
                                             bottomDivView = false;
-                                            isEdit = true
                                             return;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" v-if="selectContent?.NodeType == '201'"></JourneyTmp201>
                                 <JourneyTmp202 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
-                                            ver.CouponList = selectContent.CouponList
+                                            ver.CouponsList = selectContent.CouponsList
                                             selectContent = null;
                                             bottomDivView = false;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '202'"></JourneyTmp202>
                                 <JourneyTmp203 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
@@ -153,6 +497,20 @@
                                             bottomDivView = false;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '203'"></JourneyTmp203>
                                 <JourneyTmp204 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
@@ -163,6 +521,20 @@
                                             bottomDivView = false;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '204'"></JourneyTmp204>
                                 <JourneyTmp205 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
@@ -172,6 +544,20 @@
                                             bottomDivView = false;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '205'"></JourneyTmp205>
                                 <JourneyTmp206 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
@@ -184,6 +570,20 @@
                                             bottomDivView = false;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '206'"></JourneyTmp206>
                                 <JourneyTmp207 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
@@ -193,6 +593,20 @@
                                             bottomDivView = false;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '207'"></JourneyTmp207>
                                 <JourneyTmp208 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
@@ -202,6 +616,20 @@
                                             bottomDivView = false;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '208'"></JourneyTmp208>
                                 <JourneyTmp209 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
@@ -214,6 +642,20 @@
                                             bottomDivView = false;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '209'"></JourneyTmp209>
                                 <JourneyTmp210 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
@@ -226,6 +668,20 @@
                                             bottomDivView = false;
                                         }
                                     });
+                                    })" :remove="(() => {
+                                        confirm.require({
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                            header: '確認',
+                                            acceptClass: 'p-button-danger',
+                                            acceptLabel: '取消',
+                                            rejectLabel: '確認',
+                                            reject: () => {
+                                                journeyData.JourneyType = ''
+                                                journeyData.Content = []
+                                                selectContent = null
+                                                bottomDivView = false
+                                            }
+                                        });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '210'"></JourneyTmp210>
                             </div>
                         </div>
@@ -240,8 +696,51 @@
 
                 <!-- right div -->
                 <Transition name="right" mode="out-in">
-                    <div style="position: fixed; top: 423px; right: 0; z-index: 999;">
-                        <button style="width: 20px; padding: 0;" class="bg-purple">
+                    <div style="
+                        width: 220px; 
+                        position: fixed;
+                        z-index: 10;
+                        top: 55px;
+                        right: 0;
+                        background: white;
+                        "
+                        v-if="rightDivView"
+                        >
+                        <div style="position: absolute; top: 352px; right: 200px; z-index: 999;">
+                            <button style="width: 20px; padding: 0;" class="bg-purple" @click="(() => { rightDivView = !rightDivView })">
+                                <img src="/img/right.png" width="20" height="20" />
+                            </button>
+                        </div>
+
+                        <div class="r-div">
+                            <!-- 右方塊 -->
+                            <div class="tab-div">
+                                <ul class="nav nav-tabs">
+                                    <li class="nav-item">
+                                        <button :class=" stemp == 'B' ? 'nav-link active bg-orange' : 'nav-link bg-white' " @click="(() => { stemp = 'B' })">旅程</button>
+                                    </li>
+                                                        
+                                    <li class="nav-item">
+                                        <button :class=" stemp == 'A' ? 'nav-link active bg-purple' : 'nav-link bg-white' " @click="(() => { stemp = 'A' })">功能</button>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="temTree">
+                                <!-- 項目選單 -->
+                                <div v-show="stemp == 'A'" v-for="(item, index) in temA" :key="index" :draggable="!isEdit" @dragstart="dragStart($event)" @dragover="allowDrop">
+                                    <div v-html="category(item)"></div>
+                                </div>
+
+                                <div v-show="stemp == 'B'" v-for="(item, index) in temB" :key="index" :draggable="!isEdit && (!journeyData.JourneyType || journeyData?.JourneyType == item.NodeType.slice(1))" @dragstart="dragStart($event)" @dragover="allowDrop">
+                                    <div v-html="category(item, journeyData.JourneyType != '' && (journeyData?.JourneyType != item.NodeType.slice(1)))"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div style="position: fixed; top: 423px; right: 0; z-index: 999;" v-else>
+                        <button style="width: 20px; padding: 0;" class="bg-purple" @click="(() => { rightDivView = !rightDivView })">
                             <img src="/img/left.png" width="20" height="20" />
                         </button>
                     </div>
@@ -249,6 +748,7 @@
             </div>
         </div>
     </div>
+    <ConfirmDialog :closable="false"></ConfirmDialog>
 </template>
 
 <script lang="ts">
@@ -256,6 +756,7 @@ import { Options, Vue } from 'vue-class-component';
 import axios from 'axios';
 import { JourneyModel, JourneyNodeModel, PositionModel } from '@/model/journeyList.model';
 import store from '@/store';
+import { useConfirm } from 'primevue/useconfirm';
 
 @Options({
   components: {
@@ -379,6 +880,8 @@ export default class EditJourneyView extends Vue {
     useId: Array<string> = new Array<string>();
     endId!: number;
     importType!: string;
+    seqList: Array<string> = new Array<string>();
+    confirm = useConfirm();
     row!: number;
     col!: number;
     contentList: Array<string> = new Array<string>();
@@ -387,21 +890,32 @@ export default class EditJourneyView extends Vue {
      * 初始化
      */
     created(): void {
-        console.log('edit')
+        console.log('edit journey')
+
         this.journeyData = store.state.journey.journeyDetail
-        this.journeyData.Content = JSON.parse(this.journeyData.Content)
-        this.journeyData.JourneyType = this.journeyData?.Content[0].NodeType.slice(1)
-        this.query = {
-            JourneyId: this.journeyData.JourneyId?.toString(),
-            JourneyName: this.journeyData.JourneyName.toString(),
-            JourneyType: this.journeyData.JourneyType.toString(),
-            StartDate: this.journeyData.StartDate.toString(),
-            EndDate: this.journeyData.EndDate.toString(),
-            StatusFlag: this.journeyData.StatusFlag?.toString(),
-            SendFlag: this.journeyData.SendFlag?.toString(),
-        }
-        if (this.journeyData.JourneyType == '10') {
-            this.importType = this.journeyData.Content[0].ActivityType
+        if (!this.journeyData) {
+            this.$router.push({path: 'journey', query: this.$router.currentRoute.value.query});
+            return;
+        } else {
+            this.journeyData.Content = JSON.parse(this.journeyData.Content)
+            this.journeyData.JourneyType = this.journeyData?.Content[0].NodeType.slice(1)
+            this.query = {
+                JourneyId: this.journeyData.JourneyId?.toString(),
+                JourneyName: this.journeyData.JourneyName.toString(),
+                JourneyType: this.journeyData.JourneyType?.toString(),
+                StartDate: this.journeyData.StartDate.toString(),
+                EndDate: this.journeyData.EndDate.toString(),
+                StatusFlag: this.journeyData.StatusFlag?.toString(),
+                SendFlag: this.journeyData.SendFlag?.toString(),
+            }
+            if (this.journeyData.JourneyType == '10') {
+                this.importType = this.journeyData.Content[0].ActivityType
+            }
+    
+            this.endId = 1;
+            this.journeyData.Content.forEach((ver: JourneyNodeModel) => {
+                if (this.endId <= Number(ver.NodeId)) this.endId = Number(ver.NodeId) + 1;
+            })
         }
     }
 
@@ -409,13 +923,13 @@ export default class EditJourneyView extends Vue {
      * 繪製旅程樹
      */
     createTree(): [{ [name: string]: any }] {
-        this.dataTree = this.journeyData.Content;
+        if (typeof this.journeyData.Content == 'string') {
+            this.journeyData.Content = JSON.parse(this.journeyData.Content)
+        }
+        this.dataTree = this.journeyData?.Content ?? [];
         let column = 1;
         let row = 1;
-        let row1 = 1;
-        let rowCont = 1;
         let lists: [ { [name: string]: any }] = [{value: this.btn('基本設定', 'setting', 'A', ''), data: { NodeId: '0', NodeName: '基本設定', NodeType: '101', }, column: column, row: 1}];
-        let useList: Array<string> = [];
     
         lists.push({value: this.ALine(), column: column+1, row: 1})
 
@@ -425,33 +939,31 @@ export default class EditJourneyView extends Vue {
         this.col = 1;
         this.row = 1;
         let contentList = new Array<string>();
-        if (this.dataTree.length > 0) this.forTree(lists, '1', column, row, 0, 1, contentList)
+        if (this.dataTree.length > 0) this.forTree(lists, '1', column, row, 1, contentList)
 
         return lists;
     }
 
-    forTree(data: any, value: string, col: number, row: number, n: number, cnt: number, ctl: Array<string>): void {
+    forTree(data: any, value: string, col: number, row: number, cnt: number, ctl: Array<string>): void {
         for (const item of this.dataTree) {
             if (item.NodeId == value) {
-                console.log('item', item)
-                if (item.NodeType == '105') n--;
+                // console.log('item', item)
                 data.push({value: this.category(item), data: item, column: col, row: this.row})
                 row = this.row
                 
                 if (item.Position.length == 1) {
                     if (item.NodeType != '105') {
                         data.push({value: this.CLine(item.Position[0].label), column: col + 1, row: this.row})
-                    } else {
-                        // n--;
+                        if (this.useId.length > 0 && item.NodeId == this.useId[0].split('-')[0]) {
+                            data.push({value: this.Dbtn(), column: col + 2, row: this.row})
+                        }
                     }
                 } else if (item.Position.length > 0) {
                     ctl = item.Position.map((v: PositionModel) => {
                         return v.label
                     })
-                    // data.push({value: this.BLine(this.contentList), column: col + 1, row: this.row})
-
+                    
                     data.push({value: this.CLine(ctl[0]), column: col + 1, row: this.row})
-                    // col++;
                     cnt += item.Position.length - 1
                 }
 
@@ -461,18 +973,30 @@ export default class EditJourneyView extends Vue {
                     if (i != 0) {
                         this.row++;
                         data.push({value: this.DLine(ctl[i], this.row - row), column: col - 1, row: this.row})
+
+                        if (this.useId.length > 0 && ip.SeqId.slice(1) == this.useId[0]) {
+                            data.push({value: this.Dbtn(), column: col, row: this.row})
+                        }
+                    } else if (item.NodeType == '107') {
+                        if (this.useId.length > 0 && ip.SeqId.slice(1) == this.useId[0]) {
+                            data.push({value: this.Dbtn(), column: col, row: this.row})
+                        }
                     }
-                    this.forTree(data, ip.target.toString(), col, row, n, cnt, ctl)
-                    n++;
+
+                    this.forTree(data, ip.target.toString(), col, row, cnt, ctl)
                 })
             }
         }
     }
 
     /**
-     * 新增
+     * 修改
      */
     onCreate(): void {
+        if (this.useId?.length > 0) {
+            // return alert('尚未完成旅程建檔')
+            return store.commit('setErrorMessage', '尚未完成旅程建檔')
+        }
         store.dispatch('upLoading', true)
         console.log(this.journeyData)
         this.journeyData.Content = JSON.stringify(this.journeyData.Content)
@@ -487,13 +1011,15 @@ export default class EditJourneyView extends Vue {
                     switch(res.data?.Status) {
                         case '0':
                             // 成功
-                            alert('修改成功')
+                            // alert('修改成功')
+                            store.commit('setErrorMessage', '修改成功')
                             this.$router.push({path: 'journey', query: this.$router.currentRoute.value.query});
                             break;
 
                         case '1':
                             // 失敗
-                            alert(res.data?.Message);
+                            // alert(res.data?.Message);
+                            store.commit('setErrorMessage', res.data?.Message)
                             store.dispatch('upSess')
                             break;
 
@@ -505,6 +1031,58 @@ export default class EditJourneyView extends Vue {
                 console.log(err)
                 store.dispatch('upLoading', false)
             })
+    }
+
+    onRemove(): void {
+        this.confirm.require({
+            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+            header: '確認',
+            acceptClass: 'p-button-danger',
+            acceptLabel: '取消',
+            rejectLabel: '確認',
+            reject: () => {
+                this.remove()
+            }
+        });
+    }
+
+    remove(): void {
+        this.journeyData.Content.forEach((v: JourneyNodeModel) => {
+            v.Position.forEach((vp: PositionModel) => {
+                if (vp.target == this.selectContent?.NodeId) {
+                    this.useId = [vp.source + '-' + vp.target, ...this.useId]
+                }
+            })
+        })
+        if (this.selectContent && this.selectContent.NodeType == '105') {
+            this.journeyData.Content.forEach((v2: JourneyNodeModel) => {
+                if (v2.NodeSeq && v2.Position[0].target == this.selectContent?.NodeId) {
+                    this.seqList = [v2.NodeSeq, ...this.seqList]
+                }
+            })
+        }
+        this.removeNode(this.selectContent?.NodeId ?? '')
+        this.selectContent = null
+        this.bottomDivView = false
+    }
+
+    removeNode(value: string): void {
+        this.useId = this.useId.filter((v) => v.split('-')[0] != value)
+        this.journeyData.Content.forEach((v: JourneyNodeModel, i: number) => {
+            if(v.NodeId == value) {
+                if (v.NodeSeq) {
+                    this.seqList = this.seqList.filter((s: string) => s != v.NodeSeq)
+                    if (!this.seqList.includes(v.NodeSeq.slice(0, v.NodeSeq.length - 2)) && v.NodeSeq.slice(0, v.NodeSeq.length - 2) != '1' && this.selectContent?.NodeType != '108') {
+                        this.seqList = [v.NodeSeq.slice(0, v.NodeSeq.length - 2), ...this.seqList]
+                    }
+                }
+                v.Position.forEach((vp: PositionModel) => {
+                    if (vp.target) this.removeNode(vp.target?.toString())
+                })
+                this.journeyData.Content.splice(i, 1)
+            }
+        })
+        // this.journeyData.Content = this.journeyData?.Content?.filter((ver: JourneyNodeModel) => ver.NodeId != value)
     }
 
     /**
@@ -540,7 +1118,7 @@ export default class EditJourneyView extends Vue {
      * 將項目產生方塊
      * @param e 項目
      */
-    category(e: JourneyNodeModel): string {
+    category(e: JourneyNodeModel, disabled?: boolean): string {
         const typeValue: { [name: string]: string } = {
             '101': this.btn(e.NodeName, 'setting', 'A', ''),
             '102': this.btn(e.NodeName, 'email-line', 'C', e.NodeSeq ?? ''),
@@ -553,16 +1131,16 @@ export default class EditJourneyView extends Vue {
             '109': this.btn(e.NodeName, 'not_app', 'C', e.NodeSeq ?? ''),
             '110': this.btn(e.NodeName, 'not_edm', 'C', e.NodeSeq ?? ''),
             '111': this.btn(e.NodeName, 'not_sms', 'C', e.NodeSeq ?? ''),
-            '201': this.btn(e.NodeName, 'coupon-2-line', 'B', ''),
-            '202': this.btn(e.NodeName, 'coupon', 'B', ''),
-            '203': this.btn(e.NodeName, 'cil-birthday-cake', 'B', ''),
-            '204': this.btn(e.NodeName, 'light-member', 'B', ''),
-            '205': this.btn(e.NodeName, 'symbol-enum-member', 'B', ''),
-            '206': this.btn(e.NodeName, 'ad-product', 'B', ''),
-            '207': this.btn(e.NodeName, 'vip-crown-fill', 'B', ''),
-            '208': this.btn(e.NodeName, 'vip-crown-2-line', 'B', ''),
-            '209': this.btn(e.NodeName, 'vip-crown-2-fill', 'B', ''),
-            '210': this.btn(e.NodeName, 'import', 'B', '')
+            '201': this.btn(e.NodeName, 'coupon-2-line', disabled ? 'D' : 'B', ''),
+            '202': this.btn(e.NodeName, 'coupon', disabled ? 'D' : 'B', ''),
+            '203': this.btn(e.NodeName, 'cil-birthday-cake', disabled ? 'D' : 'B', ''),
+            '204': this.btn(e.NodeName, 'light-member', disabled ? 'D' : 'B', ''),
+            '205': this.btn(e.NodeName, 'symbol-enum-member', disabled ? 'D' : 'B', ''),
+            '206': this.btn(e.NodeName, 'ad-product', disabled ? 'D' : 'B', ''),
+            '207': this.btn(e.NodeName, 'vip-crown-fill', disabled ? 'D' :'B', ''),
+            '208': this.btn(e.NodeName, 'vip-crown-2-line', disabled ? 'D' :'B', ''),
+            '209': this.btn(e.NodeName, 'vip-crown-2-fill', disabled ? 'D' : 'B', ''),
+            '210': this.btn(e.NodeName, 'import', disabled ? 'D' : 'B', '')
         }
 
         return typeValue[e.NodeType] ?? ''
@@ -623,14 +1201,474 @@ export default class EditJourneyView extends Vue {
      * 拖動結束
      * @param e 方塊
      */
+    // dropTrigger(e: any): void {
+    //     this.allowDrop(e);
+    //     const dragText = e.dataTransfer.getData("Text");
+
+    //     if (this.useId.length > 0 && dragText == '結束') {
+    //         const uId = this.useId[0].split('-')[0].toString();
+    //         this.dataTree.forEach((ver: JourneyNodeModel) => {
+    //             if (ver.NodeId == uId) {
+    //                 if (ver.NodeType == '102' || 
+    //                     ver.NodeType == '104' || 
+    //                     ver.NodeType == '106' || 
+    //                     ver.NodeType == '107' || 
+    //                     ver.NodeType == '109' || 
+    //                     ver.NodeType == '110' || 
+    //                     ver.NodeType == '111'
+    //                 ) {
+    //                     this.dataTree.push({
+    //                         NodeId: this.useId[0].split('-')[1],
+    //                         NodeName: dragText,
+    //                         NodeType: "105",
+    //                         Position: []
+    //                     })
+    //                     this.selectContent = {
+    //                         NodeId: this.useId[0].split('-')[1],
+    //                         NodeName: dragText,
+    //                         NodeType: "105",
+    //                         Position: [],
+    //                     };
+    //                     this.bottomDivView = true;
+    //                     this.useId.splice(0, 1)
+    //                     return;
+    //                 }
+    //             }
+    //         })
+
+    //     }
+
+    //     if (this.selectContent) return;
+
+    //     switch(dragText) {
+    //         case 'COUPON':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '01'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "201",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "201",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '精算抵用券':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '02'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "202",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "202",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '生日禮':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '03'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "203",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "203",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '新會員活動':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '04'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "204",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "204",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '新會員權益':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '05'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "205",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "205",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '商品購買':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '06'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "206",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "206",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '金續金':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '07'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "207",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "207",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '普升金':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '08'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "208",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "208",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '準金卡':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '09'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "209",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "209",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '名單匯入':
+    //             if (this.dataTree.length == 0) {
+    //                 this.journeyData.JourneyType = '10'
+    //                 this.dataTree.push({
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "210",
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e1-2",
+    //                             "source": '1',
+    //                             "target": '2',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "1",
+    //                     NodeName: dragText,
+    //                     NodeType: "210",
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //             }
+    //             break;
+
+    //         case '發送時間':
+    //             if (this.dataTree.length == 1) {
+    //                 this.dataTree.push({
+    //                     NodeId: "2",
+    //                     NodeName: dragText,
+    //                     NodeType: "103",
+    //                     IsBestOffer: '0',
+    //                     Position: [
+    //                         {
+    //                             "SeqId": "e2-3",
+    //                             "source": '2',
+    //                             "target": '3',
+    //                             "label": ""
+    //                         }
+    //                     ],
+    //                 });
+    //                 this.selectContent = {
+    //                     NodeId: "2",
+    //                     NodeName: dragText,
+    //                     NodeType: "103",
+    //                     IsBestOffer: '0',
+    //                     Position: [],
+    //                 };
+    //                 this.bottomDivView = true;
+    //                 this.useId.push('2-3')
+    //                 this.endId = 4
+    //             } else if (this.useId.length > 0) {
+    //                 const uId = this.useId[0].split('-')[0].toString();
+    //                 this.dataTree.forEach((ver: JourneyNodeModel) => {
+    //                     if (ver.NodeId == uId && (
+    //                         ver.NodeType == '102' || 
+    //                         ver.NodeType == '104' || 
+    //                         ver.NodeType == '106' || 
+    //                         ver.NodeType == '109' || 
+    //                         ver.NodeType == '110' || 
+    //                         ver.NodeType == '111'
+    //                     )) {
+    //                         this.dataTree.push({
+    //                             NodeId: this.useId[0].split('-')[1],
+    //                             NodeName: dragText,
+    //                             NodeType: "103",
+    //                             IsBestOffer: '0',
+    //                             Position: [
+    //                                 {
+    //                                     "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
+    //                                     "source": this.useId[0].split('-')[1],
+    //                                     "target": this.endId,
+    //                                     "label": ""
+    //                                 }
+    //                             ]
+    //                         })
+    //                         this.selectContent = {
+    //                             NodeId: this.useId[0].split('-')[1],
+    //                             NodeName: dragText,
+    //                             NodeType: "103",
+    //                             IsBestOffer: '0',
+    //                             Position: [],
+    //                         };
+    //                         this.bottomDivView = true;
+    //                         this.useId.push(this.useId[0].split('-')[1] + '-' + this.endId)
+    //                         this.useId.splice(0, 1)
+    //                         this.endId ++;
+    //                         return;
+    //                     }
+    //                 })
+    //             }
+    //             break;
+
+    //         case '判斷條件':
+    //             if (this.useId.length > 0) {
+    //                 const uId = this.useId[0].split('-')[0].toString();
+    //                 this.dataTree.forEach((ver: JourneyNodeModel) => {
+    //                     if (ver.NodeId == uId && ver.NodeType == '103' && (
+    //                         this.journeyData.JourneyType == '01' ||
+    //                         this.journeyData.JourneyType == '02' ||
+    //                         this.journeyData.JourneyType == '03' ||
+    //                         this.journeyData.JourneyType == '04' ||
+    //                         this.journeyData.JourneyType == '06' ||
+    //                         this.journeyData.JourneyType == '09' ||
+    //                         this.journeyData.JourneyType == '10'
+    //                     )) {
+    //                         this.dataTree.push({
+    //                             NodeId: this.useId[0].split('-')[1],
+    //                             NodeName: dragText,
+    //                             NodeType: "107",
+    //                             JudgeType: '',
+    //                             Position: [
+    //                                 {
+    //                                     "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
+    //                                     "source": this.useId[0].split('-')[1],
+    //                                     "target": this.endId++,
+    //                                     "label": "有"
+    //                                 },
+    //                                 {
+    //                                     "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
+    //                                     "source": this.useId[0].split('-')[1],
+    //                                     "target": this.endId,
+    //                                     "label": "無"
+    //                                 },
+    //                             ]
+    //                         })
+    //                         this.selectContent = {
+    //                             NodeId: this.useId[0].split('-')[1],
+    //                             NodeName: dragText,
+    //                             NodeType: "107",
+    //                             Position: [],
+    //                         };
+    //                         this.bottomDivView = true;
+    //                         this.endId--;
+    //                         this.useId.push(this.useId[0].split('-')[1] + '-' + this.endId++)
+    //                         this.useId.push(this.useId[0].split('-')[1] + '-' + this.endId++)
+    //                         this.useId.splice(0, 1)
+    //                         // this.endId ++;
+    //                         return;
+    //                     }
+    //                 })
+    //             }
+    //             break;
+
+    //         case '溝通管道':
+    //             if (this.useId.length > 0) {
+    //                 const uId = this.useId[0].split('-')[0].toString();
+    //                 this.dataTree.forEach((ver: JourneyNodeModel) => {
+    //                     if (ver.NodeId == uId && (ver.NodeType == '103' || ver.NodeType == '107')) {
+    //                         this.dataTree.push({
+    //                             NodeId: this.useId[0].split('-')[1],
+    //                             NodeName: dragText,
+    //                             NodeType: "108",
+    //                             Position: []
+    //                         })
+    //                         this.selectContent = {
+    //                             NodeId: this.useId[0].split('-')[1],
+    //                             NodeName: dragText,
+    //                             NodeType: "108",
+    //                             Position: [],
+    //                         };
+    //                         this.bottomDivView = true;
+    //                         this.useId.splice(0, 1)
+    //                         // this.endId ++;
+    //                         return;
+    //                     }
+    //                 })
+
+    //             }
+    //             break;
+
+    //         default:
+    //             break;
+        
+    //     }
+    // }
     dropTrigger(e: any): void {
         this.allowDrop(e);
         const dragText = e.dataTransfer.getData("Text");
+
+        if (this.selectContent && (
+            this.selectContent.NodeType !== '105' &&
+            this.selectContent.NodeType !== '109' &&
+            this.selectContent.NodeType !== '110' &&
+            this.selectContent.NodeType !== '111'
+            // )) return alert('此節點無法連結');
+            )) return store.commit('setErrorMessage', '此節點無法連結')
 
         if (this.useId.length > 0 && dragText == '結束') {
             const uId = this.useId[0].split('-')[0].toString();
             this.dataTree.forEach((ver: JourneyNodeModel) => {
                 if (ver.NodeId == uId) {
+                    // console.log(ver.NodeType)
                     if (ver.NodeType == '102' || 
                         ver.NodeType == '104' || 
                         ver.NodeType == '106' || 
@@ -639,11 +1677,19 @@ export default class EditJourneyView extends Vue {
                         ver.NodeType == '110' || 
                         ver.NodeType == '111'
                     ) {
+                        if (ver.NodeType != '107') {
+                            this.seqList = this.seqList.filter(v => v != ver.NodeSeq)
+                        }
                         this.dataTree.push({
                             NodeId: this.useId[0].split('-')[1],
                             NodeName: dragText,
                             NodeType: "105",
-                            Position: []
+                            Position: [{
+                                "SeqId": "",
+                                "source": "",
+                                "target": "",
+                                "label": ""
+                            }]
                         })
                         this.selectContent = {
                             NodeId: this.useId[0].split('-')[1],
@@ -654,13 +1700,14 @@ export default class EditJourneyView extends Vue {
                         this.bottomDivView = true;
                         this.useId.splice(0, 1)
                         return;
+                    } else {
+                        // return alert('此節點無法連結');
+                        return store.commit('setErrorMessage', '此節點無法連結')
                     }
                 }
             })
 
         }
-
-        if (this.selectContent) return;
 
         switch(dragText) {
             case 'COUPON':
@@ -715,7 +1762,7 @@ export default class EditJourneyView extends Vue {
                 }
                 break;
 
-            case '生日禮':
+            case '生日':
                 if (this.dataTree.length == 0) {
                     this.journeyData.JourneyType = '03'
                     this.dataTree.push({
@@ -774,6 +1821,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "205",
+                        NewMemSelectDate: '1',
                         Position: [
                             {
                                 "SeqId": "e1-2",
@@ -787,6 +1835,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "205",
+                        NewMemSelectDate: '1',
                         Position: [],
                     };
                     this.bottomDivView = true;
@@ -800,6 +1849,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "206",
+                        IsMaxPay: '0',
                         Position: [
                             {
                                 "SeqId": "e1-2",
@@ -813,6 +1863,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "206",
+                        IsMaxPay: '0',
                         Position: [],
                     };
                     this.bottomDivView = true;
@@ -826,6 +1877,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "207",
+                        SelectDate: '15',
                         Position: [
                             {
                                 "SeqId": "e1-2",
@@ -839,6 +1891,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "207",
+                        SelectDate: '15',
                         Position: [],
                     };
                     this.bottomDivView = true;
@@ -852,6 +1905,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "208",
+                        SelectDate: '15',
                         Position: [
                             {
                                 "SeqId": "e1-2",
@@ -865,6 +1919,7 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "208",
+                        SelectDate: '15',
                         Position: [],
                     };
                     this.bottomDivView = true;
@@ -878,6 +1933,10 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "209",
+                        SelectDate: '15',
+                        DateType: '0',
+                        PayAmtStart: '0',
+                        PayAmtEnd: '0',
                         Position: [
                             {
                                 "SeqId": "e1-2",
@@ -891,6 +1950,10 @@ export default class EditJourneyView extends Vue {
                         NodeId: "1",
                         NodeName: dragText,
                         NodeType: "209",
+                        SelectDate: '15',
+                        DateType: '0',
+                        PayAmtStart: '0',
+                        PayAmtEnd: '0',
                         Position: [],
                     };
                     this.bottomDivView = true;
@@ -929,7 +1992,6 @@ export default class EditJourneyView extends Vue {
                         NodeId: "2",
                         NodeName: dragText,
                         NodeType: "103",
-                        IsBestOffer: '0',
                         Position: [
                             {
                                 "SeqId": "e2-3",
@@ -943,51 +2005,58 @@ export default class EditJourneyView extends Vue {
                         NodeId: "2",
                         NodeName: dragText,
                         NodeType: "103",
-                        IsBestOffer: '0',
                         Position: [],
                     };
                     this.bottomDivView = true;
-                    this.useId.push('2-3')
+                    this.useId = ['2-3']
                     this.endId = 4
+                    return;
                 } else if (this.useId.length > 0) {
                     const uId = this.useId[0].split('-')[0].toString();
                     this.dataTree.forEach((ver: JourneyNodeModel) => {
-                        if (ver.NodeId == uId && (
-                            ver.NodeType == '102' || 
-                            ver.NodeType == '104' || 
-                            ver.NodeType == '106' || 
-                            ver.NodeType == '109' || 
-                            ver.NodeType == '110' || 
-                            ver.NodeType == '111'
-                        )) {
-                            this.dataTree.push({
-                                NodeId: this.useId[0].split('-')[1],
-                                NodeName: dragText,
-                                NodeType: "103",
-                                IsBestOffer: '0',
-                                Position: [
-                                    {
-                                        "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
-                                        "source": this.useId[0].split('-')[1],
-                                        "target": this.endId,
-                                        "label": ""
-                                    }
-                                ]
-                            })
-                            this.selectContent = {
-                                NodeId: this.useId[0].split('-')[1],
-                                NodeName: dragText,
-                                NodeType: "103",
-                                IsBestOffer: '0',
-                                Position: [],
-                            };
-                            this.bottomDivView = true;
-                            this.useId.push(this.useId[0].split('-')[1] + '-' + this.endId)
-                            this.useId.splice(0, 1)
-                            this.endId ++;
-                            return;
+                        if (ver.NodeId == uId) {
+                            if (
+                                ver.NodeType == '102' || 
+                                ver.NodeType == '104' || 
+                                ver.NodeType == '106' || 
+                                ver.NodeType == '109' || 
+                                ver.NodeType == '110' || 
+                                ver.NodeType == '111'
+                            ) {
+                                // if (this.seqList.length > 0) this.seqList.splice(0, 1)
+                                this.dataTree.push({
+                                    NodeId: this.useId[0].split('-')[1],
+                                    NodeName: dragText,
+                                    NodeType: "103",
+                                    Position: [
+                                        {
+                                            "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
+                                            "source": this.useId[0].split('-')[1],
+                                            "target": this.endId,
+                                            "label": ""
+                                        }
+                                    ]
+                                })
+                                this.selectContent = {
+                                    NodeId: this.useId[0].split('-')[1],
+                                    NodeName: dragText,
+                                    NodeType: "103",
+                                    Position: [],
+                                };
+                                this.bottomDivView = true;
+                                this.useId.push(this.useId[0].split('-')[1] + '-' + this.endId)
+                                this.useId.splice(0, 1)
+                                this.endId ++;
+                                return;
+                            } else {
+                                // return alert('此節點無法連結');
+                                return store.commit('setErrorMessage', '此節點無法連結')
+                            }
                         }
                     })
+                } else {
+                    // return alert('此節點無法連結');
+                    return store.commit('setErrorMessage', '此節點無法連結')
                 }
                 break;
 
@@ -995,50 +2064,58 @@ export default class EditJourneyView extends Vue {
                 if (this.useId.length > 0) {
                     const uId = this.useId[0].split('-')[0].toString();
                     this.dataTree.forEach((ver: JourneyNodeModel) => {
-                        if (ver.NodeId == uId && ver.NodeType == '103' && (
-                            this.journeyData.JourneyType == '01' ||
-                            this.journeyData.JourneyType == '02' ||
-                            this.journeyData.JourneyType == '03' ||
-                            this.journeyData.JourneyType == '04' ||
-                            this.journeyData.JourneyType == '06' ||
-                            this.journeyData.JourneyType == '09' ||
-                            this.journeyData.JourneyType == '10'
-                        )) {
-                            this.dataTree.push({
-                                NodeId: this.useId[0].split('-')[1],
-                                NodeName: dragText,
-                                NodeType: "107",
-                                JudgeType: '',
-                                Position: [
-                                    {
-                                        "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
-                                        "source": this.useId[0].split('-')[1],
-                                        "target": this.endId++,
-                                        "label": "有"
-                                    },
-                                    {
-                                        "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
-                                        "source": this.useId[0].split('-')[1],
-                                        "target": this.endId,
-                                        "label": "無"
-                                    },
-                                ]
-                            })
-                            this.selectContent = {
-                                NodeId: this.useId[0].split('-')[1],
-                                NodeName: dragText,
-                                NodeType: "107",
-                                Position: [],
-                            };
-                            this.bottomDivView = true;
-                            this.endId--;
-                            this.useId.push(this.useId[0].split('-')[1] + '-' + this.endId++)
-                            this.useId.push(this.useId[0].split('-')[1] + '-' + this.endId++)
-                            this.useId.splice(0, 1)
-                            // this.endId ++;
-                            return;
+                        if (ver.NodeId == uId ) {
+                            if (( this.journeyData.JourneyType == '01' ||
+                                this.journeyData.JourneyType == '02' ||
+                                this.journeyData.JourneyType == '03' ||
+                                this.journeyData.JourneyType == '04' ||
+                                this.journeyData.JourneyType == '06' ||
+                                this.journeyData.JourneyType == '09' ||
+                                this.journeyData.JourneyType == '10' )
+                                && ver.NodeType == '103'
+                            ) {
+                                this.dataTree.push({
+                                    NodeId: this.useId[0].split('-')[1],
+                                    NodeName: dragText,
+                                    NodeType: "107",
+                                    JudgeType: '',
+                                    Position: [
+                                        {
+                                            "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
+                                            "source": this.useId[0].split('-')[1],
+                                            "target": this.endId++,
+                                            "label": "有"
+                                        },
+                                        {
+                                            "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
+                                            "source": this.useId[0].split('-')[1],
+                                            "target": this.endId,
+                                            "label": "無"
+                                        },
+                                    ]
+                                })
+                                this.selectContent = {
+                                    NodeId: this.useId[0].split('-')[1],
+                                    NodeName: dragText,
+                                    NodeType: "107",
+                                    Position: [],
+                                };
+                                this.bottomDivView = true;
+                                this.endId--;
+                                this.useId.push(this.useId[0].split('-')[1] + '-' + this.endId++)
+                                this.useId.push(this.useId[0].split('-')[1] + '-' + this.endId++)
+                                this.useId.splice(0, 1)
+                                // this.endId ++;
+                                return;
+                            } else {
+                                // return alert('此節點無法連結');
+                                return store.commit('setErrorMessage', '此節點無法連結')
+                            }
                         }
                     })
+                } else {
+                    // return alert('此節點無法連結'); 
+                    return store.commit('setErrorMessage', '此節點無法連結')
                 }
                 break;
 
@@ -1046,23 +2123,28 @@ export default class EditJourneyView extends Vue {
                 if (this.useId.length > 0) {
                     const uId = this.useId[0].split('-')[0].toString();
                     this.dataTree.forEach((ver: JourneyNodeModel) => {
-                        if (ver.NodeId == uId && (ver.NodeType == '103' || ver.NodeType == '107')) {
-                            this.dataTree.push({
-                                NodeId: this.useId[0].split('-')[1],
-                                NodeName: dragText,
-                                NodeType: "108",
-                                Position: []
-                            })
-                            this.selectContent = {
-                                NodeId: this.useId[0].split('-')[1],
-                                NodeName: dragText,
-                                NodeType: "108",
-                                Position: [],
-                            };
-                            this.bottomDivView = true;
-                            this.useId.splice(0, 1)
-                            // this.endId ++;
-                            return;
+                        if (ver.NodeId == uId) {
+                            if (ver.NodeType == '103' || ver.NodeType == '107') {
+                                this.dataTree.push({
+                                    NodeId: this.useId[0].split('-')[1],
+                                    NodeName: dragText,
+                                    NodeType: "108",
+                                    Position: []
+                                })
+                                this.selectContent = {
+                                    NodeId: this.useId[0].split('-')[1],
+                                    NodeName: dragText,
+                                    NodeType: "108",
+                                    Position: [],
+                                };
+                                this.bottomDivView = true;
+                                this.useId.splice(0, 1)
+                                // this.endId ++;
+                                return;
+                            } else {
+                                // return alert('此節點無法連結');
+                                return store.commit('setErrorMessage', '此節點無法連結')
+                            }
                         }
                     })
 
@@ -1070,6 +2152,7 @@ export default class EditJourneyView extends Vue {
                 break;
 
             default:
+                // alert('此節點無法連結');
                 break;
         
         }
@@ -1099,7 +2182,7 @@ export default class EditJourneyView extends Vue {
      */
     btn(text: string, img: string, type: string, seq: string) {
         return `
-            <div>
+            <div style="margin-left: 6px;">
                 <div style="${seq ? 'min-width: 60px; text-align: center; margin-top: -25px; width: max-content;' : 'display: none'}">
                     <span class="f-12">${ seq }</span>
                 </div>
@@ -1109,6 +2192,14 @@ export default class EditJourneyView extends Vue {
                 <div style="white-space:nowrap;">
                     <span class="f-14">${ text }</span>
                 </div>
+            </div>
+        `;
+    }
+
+    Dbtn() {
+        return `
+            <div>
+                <div class="default-tag""></div>
             </div>
         `;
     }
@@ -1259,7 +2350,8 @@ export default class EditJourneyView extends Vue {
             'A': 'purple-tag',
             'AT': 'purple-tag div-tran',
             'B': 'orange-tag',
-            'C': 'blue-tag'
+            'C': 'blue-tag',
+            'D': 'grey-tag'
         }
 
         return typeValue[type] ?? ''
@@ -1290,15 +2382,10 @@ export default class EditJourneyView extends Vue {
     }
 
     .content {
-        // padding-bottom: 0;
         display: flex;
         margin-left: auto;
         margin-right: auto;
         max-width: 100vw;
-        // padding-bottom: 3rem;
-        // padding-top: 1rem;
-        // padding-left: 1rem;
-        // padding-right: 1rem;
         color: rgba(55, 65, 81, 1);
         width: 100%;
         border: 1px solid #ccc;
@@ -1334,10 +2421,9 @@ export default class EditJourneyView extends Vue {
         margin: auto 0;
         display: grid;
         height: 80vh;
-        padding: 32px 20vw 280px 0;
+        padding: 32px 25vw 280px 0;
         margin-right: 10vw;
         overflow: auto;
-        // grid-template-rows: 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px;
         grid-auto-rows: 160px;
     }
 

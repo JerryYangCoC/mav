@@ -14,9 +14,9 @@
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>有效期間：</span>
                 <div>
-                    <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="dd.StartDate" :disabled="isEdit" required />
+                    <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="dd.StartDate" autocomplete="no-autofill" :disabled="isEdit" required />
                     ～
-                    <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="dd.EndDate" :disabled="isEdit" required />
+                    <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="dd.EndDate" autocomplete="no-autofill" :disabled="isEdit" required />
                 </div>
             </div>
     
@@ -48,6 +48,7 @@ import { Options, Vue } from 'vue-class-component';
 import { JourneyModel } from '@/model/journeyList.model';
 import moment from 'moment';
 import $ from 'jquery';
+import store from '@/store';
 
 /**
  * 旅程基本設定
@@ -69,12 +70,21 @@ export default class JourneyTmp101 extends Vue {
     created(): void {
         $( function() {
             $( "#StartYMD" ).datepicker({
-                dateFormat: "yy/mm/dd"
+                dateFormat: "yy/mm/dd",
             });
             $( "#EndYMD" ).datepicker({
-                dateFormat: "yy/mm/dd"
+                dateFormat: "yy/mm/dd",
             });
         });
+
+        setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#StartYMD" ).datepicker( "hide" );
+                    $( "#EndYMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
     }
 
     changeDate(value: any): void {
@@ -90,26 +100,30 @@ export default class JourneyTmp101 extends Vue {
       
       if (date == 'Invalid date' || date?.length != 10) {
           date = ''
-          alert('日期格式錯誤')
+        //   alert('日期格式錯誤')
+        store.commit('setErrorMessage', '日期格式錯誤')
       }
       
       return value.id == 'StartYMD' ? this.dd.StartDate = date : this.dd.EndDate = date
     }
 
     onClick(): void {
-        if (this.dd.StartDate >= this.dd.EndDate || this.dd.StartDate < moment().format('YYYY/MM/DD')) return alert('有效日期錯誤');
+        // if (this.dd.StartDate >= this.dd.EndDate || this.dd.StartDate < moment().format('YYYY/MM/DD')) return alert('有效日期錯誤');
+        if (this.dd.StartDate >= this.dd.EndDate || this.dd.StartDate < moment().format('YYYY/MM/DD')) return store.commit('setErrorMessage', '有效期間錯誤')
         this.active();
     }
 
     onStartYMD(): void {
         setTimeout(() => {
-            this.dd.StartDate = (window.document.getElementById('StartYMD') as any).value
+            this.dd.StartDate = (window.document.getElementById('StartYMD') as any).value;
+            // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.dd.EndDate = (window.document.getElementById('EndYMD') as any).value
+            // $( "#EndYMD" ).datepicker( "hide" );
         }, 150)
     }
 }

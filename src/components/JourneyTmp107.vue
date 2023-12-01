@@ -33,18 +33,18 @@
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;" v-if="value.JudgeType == '3' || value.JudgeType == '4' || value.JudgeType == '5'">
                 <span><span class="ask-red">*</span>消費期間：</span>
                 <div>
-                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.ConsumeStartYMD" required :disabled="isEdit" />
+                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.ConsumeStartYMD" autocomplete="no-autofill" required :disabled="isEdit" />
                     ～
-                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.ConsumeEndYMD" required :disabled="isEdit" />
+                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.ConsumeEndYMD" autocomplete="no-autofill" required :disabled="isEdit" />
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;" v-if="value.JudgeType == '6'">
                 <span><span class="ask-red">*</span>排除商品消費期間：</span>
                 <div>
-                    <input type="text" id="RStartYMD" @change="changeDate($event.target)" @blur="onRStartYMD()" v-model="value.RemindedStartYMD" required :disabled="isEdit" />
+                    <input type="text" id="RStartYMD" @change="changeDate($event.target)" @blur="onRStartYMD()" v-model="value.RemindedStartYMD" autocomplete="no-autofill" required :disabled="isEdit" />
                     ～
-                    <input type="text" id="REndYMD" @change="changeDate($event.target)" @blur="onREndYMD()" v-model="value.RemindedEndYMD" required :disabled="isEdit" />
+                    <input type="text" id="REndYMD" @change="changeDate($event.target)" @blur="onREndYMD()" v-model="value.RemindedEndYMD" autocomplete="no-autofill" required :disabled="isEdit" />
                 </div>
             </div>
 
@@ -67,6 +67,7 @@ import { Options, Vue } from 'vue-class-component';
 import { JourneyModel, JourneyNodeModel } from '@/model/journeyList.model';
 import moment from 'moment';
 import $ from 'jquery';
+import store from '@/store';
 
 /**
  * 判斷條件
@@ -106,6 +107,17 @@ export default class JourneyTmp107 extends Vue {
                 dateFormat: "yy/mm/dd"
             });
         });
+        
+        setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#StartYMD" ).datepicker( "hide" );
+                    $( "#EndYMD" ).datepicker( "hide" );
+                    $( "#RStartYMD" ).datepicker( "hide" );
+                    $( "#REndYMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
     }
     
     changeDate(value: any): void {
@@ -121,7 +133,8 @@ export default class JourneyTmp107 extends Vue {
       
       if (date == 'Invalid date' || date?.length != 10) {
           date = ''
-          alert('日期格式錯誤')
+        //   alert('日期格式錯誤')
+        store.commit('setErrorMessage', '日期格式錯誤')
       }
       
       switch(value.id) {
@@ -145,24 +158,28 @@ export default class JourneyTmp107 extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.value.ConsumeStartYMD = (window.document.getElementById('StartYMD') as any).value
+            // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.value.ConsumeEndYMD = (window.document.getElementById('EndYMD') as any).value
+            // $( "#EndYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onRStartYMD(): void {
         setTimeout(() => {
             this.value.RemindedStartYMD = (window.document.getElementById('RStartYMD') as any).value
+            // $( "#RStartYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onREndYMD(): void {
         setTimeout(() => {
             this.value.RemindedEndYMD = (window.document.getElementById('REndYMD') as any).value
+            // $( "#REndYMD" ).datepicker( "hide" );
         }, 150)
     }
 

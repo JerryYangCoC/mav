@@ -1,6 +1,15 @@
 –<template>
   <router-view/>
   <Loading />
+  <Dialog :visible="store.state.errorMessage" modal header="" :closable="false" :style="{ width: '300px' }">
+    <p style="margin: 1rem 0;">
+        {{ errorMessage() }}
+    </p>
+
+    <div style="display: flex; justify-content: flex-end;">
+        <input type="button" class="btn-def" style="" @click="onCloseError()" value="確定" />
+    </div>
+</Dialog>
 </template>
 
 <script lang="ts">
@@ -14,6 +23,8 @@ import store from './store';
   },
 })
 export default class App extends Vue {
+    errorVisible = false;
+    store = store
 
   /**
    * 初始化
@@ -21,6 +32,16 @@ export default class App extends Vue {
    created(): void {
     console.log('new App')
     store.dispatch('upLoading', false)
+
+    this.errorVisible = this.errorMessage() ? true : false
+  }
+
+  onCloseError(): void {
+    store.commit('setErrorMessage', null)
+  }
+
+  errorMessage(): string {
+    return store.state.errorMessage
   }
 }
 </script>
@@ -643,12 +664,12 @@ textarea {
 }
 .hr-space-square::before {
   content: attr(data-content);
-    padding: 6px 10px 0 0;
+    padding: 8px 10px 0 0;
     width: 100px;
     display: flex;
     justify-content: flex-end;
     line-height: 1px;
-    font-size: 14px;
+    font-size: 12px;
 }
 .hr-space-square::after {
   content: '';
@@ -721,7 +742,7 @@ dl, ol, ul {
 
 .box-Cop th {
     background: #7f7f7f !important;
-    padding: 4px !important;
+    padding: 4px 1rem !important;
     color: white !important;
 }
 

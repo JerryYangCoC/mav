@@ -21,7 +21,7 @@
                     </div>
 
                     <div v-if="value.SendType == '2'">
-                        <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="value.SelectTime" required :disabled="isEdit" />
+                        <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="value.SelectTime" autocomplete="no-autofill" required :disabled="isEdit" />
                     </div>
                 </div>
             </div>
@@ -64,6 +64,7 @@ import { Options, Vue } from 'vue-class-component';
 import { JourneyModel, JourneyNodeModel } from '@/model/journeyList.model';
 import moment from 'moment';
 import $ from 'jquery';
+import store from '@/store';
 
 /**
  * 發送時間
@@ -86,6 +87,22 @@ export default class JourneyTmp103 extends Vue {
     remove!: () => void;
     isEdit!: boolean;
 
+    created(): void {
+        $( function() {
+            $( "#StartYMD" ).datepicker({
+                dateFormat: "yy/mm/dd"
+            });
+        });
+        
+        setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#StartYMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
+    }
+
     onClick(): void {
         this.active();
     }
@@ -107,7 +124,8 @@ export default class JourneyTmp103 extends Vue {
       
       if (date == 'Invalid date' || date?.length != 10) {
           date = ''
-          alert('日期格式錯誤')
+        //   alert('日期格式錯誤')
+        store.commit('setErrorMessage', '日期格式錯誤')
       }
       
       return this.value.SelectTime = date
@@ -136,6 +154,7 @@ export default class JourneyTmp103 extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.value.SelectTime = (window.document.getElementById('StartYMD') as any).value
+            // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }
 }

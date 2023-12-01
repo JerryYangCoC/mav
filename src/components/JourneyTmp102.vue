@@ -60,7 +60,7 @@
                 </div>
 
                 <div style="text-align: right; padding-right: 100px;">
-                    <span>{{ tempPeople }} 人</span>
+                    <span v-show="tempPeople != ''">{{ tempPeople }} 人</span>
                 </div>
             </div>
             
@@ -142,7 +142,7 @@ export default class JourneyTmp102 extends Vue {
         // JourneyType: '',
         CopyWriteID: ''
     }
-    tempPeople = '?';
+    tempPeople = '';
     isEdit!: boolean;
     fileTitle!: string;
     fileData = [{}];

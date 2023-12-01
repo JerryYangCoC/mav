@@ -61,7 +61,7 @@
                 </div>
 
                 <div style="text-align: right; padding-right: 100px;">
-                    <span>{{ tempPeople }} 人</span>
+                    <span v-show="tempPeople != ''">{{ tempPeople }} 人</span>
                 </div>
             </div>
             
@@ -156,7 +156,7 @@ export default class JourneyTmp106 extends Vue {
         CopyWriteID: '',
         CopyWriteType: '01'
     }
-    tempPeople = '?';
+    tempPeople = '';
     isEdit!: boolean;
     fileTitle!: string;
     fileData = [{}];
@@ -216,6 +216,9 @@ export default class JourneyTmp106 extends Vue {
         this.remove();
     }
 
+    /**
+     * 暫存人數
+     */
     onStash(): void {
         let data = {
             JourneyType: '2' + this.dd.JourneyType,
@@ -261,7 +264,7 @@ export default class JourneyTmp106 extends Vue {
             this.dd.Content.forEach((ver: JourneyNodeModel) => {
                 if (ver.NodeSeq && ver.NodeSeq == seq) {
                     let select = this.dd.Content.filter((v: JourneyNodeModel) => v.NodeId == ver.Position[0].target)
-                    console.log('select', select[0])
+                    // console.log('select', select[0])
                     if (select.length > 0) {
                         data.SendType = select[0].SendType
                         data.SelectTime = select[0].SelectTime
@@ -271,7 +274,7 @@ export default class JourneyTmp106 extends Vue {
 
                     if (this.dd.JourneyType != '05' && this.dd.JourneyType != '07' && this.dd.JourneyType != '08') {
                         let select2 = this.dd.Content.filter((v: JourneyNodeModel) => v.NodeId == select[0].Position[0].target)
-                        console.log('select2', select2[0])
+                        // console.log('select2', select2[0])
                         if (select2.length > 0 && select2[0].NodeType == '107') {
                             data.JudgeType = select2[0].JudgeType
                             data.ConsumeStartYMD = select2[0]?.ConsumeStartYMD

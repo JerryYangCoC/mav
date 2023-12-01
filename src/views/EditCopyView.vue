@@ -41,12 +41,12 @@
 
                 <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>有效起日：</span>
-                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="copyData.StartYMD" :disabled="!isEdit" />
+                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="copyData.StartYMD" autocomplete="no-autofill" :disabled="!isEdit" />
                 </div>
 
                 <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>有效訖日：</span>
-                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="copyData.EndYMD" :disabled="!isEdit" />
+                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="copyData.EndYMD" autocomplete="no-autofill" :disabled="!isEdit" />
                 </div>
             </div>
 
@@ -200,7 +200,7 @@
             </div>
         </div>
     </div>
-    <ConfirmDialog></ConfirmDialog>
+    <ConfirmDialog :closable="false"></ConfirmDialog>
 </template>
 
 <script lang="ts">
@@ -208,11 +208,10 @@ import store from '@/store';
 import { Options, Vue } from 'vue-class-component';
 import { CopyModel } from '../model/copyList.model';
 import Dialog from 'primevue/dialog';
-import ConfirmDialog from 'primevue/confirmdialog';
 import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from "primevue/useconfirm";
-import moment from 'moment';
+import moment from 'moment';;
 
 @Options({
     components: {
@@ -241,6 +240,23 @@ export default class EditCopyView extends Vue {
     created(): void {
         console.log('new view copy page')
         this.init();
+        $( function() {
+            $( "#StartYMD" ).datepicker({
+                dateFormat: "yy/mm/dd",
+            });
+            $( "#EndYMD" ).datepicker({
+                dateFormat: "yy/mm/dd",
+            });
+        });
+
+        setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#StartYMD" ).datepicker( "hide" );
+                    $( "#EndYMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
     }
 
     init(): void {
@@ -260,7 +276,7 @@ export default class EditCopyView extends Vue {
                 store.dispatch('setCopy', this.copyData)
                 setTimeout(() => {
                     this.onToList();
-                }, 150)
+                }, 100)
             }
         });
     }
@@ -284,13 +300,15 @@ export default class EditCopyView extends Vue {
                     switch(res.data?.Status) {
                         case '0':
                             // 成功
-                            alert('修改成功')
+                            // alert('修改成功')
+                            store.commit('setErrorMessage', '修改成功')
                             this.onToList();
                             break;
 
                         case '1':
                             // 失敗
-                            alert(res.data?.Message);
+                            // alert(res.data?.Message);
+                            store.commit('setErrorMessage', res.data?.Message)
                             store.dispatch('upSess')
                             break;
 
@@ -310,11 +328,9 @@ export default class EditCopyView extends Vue {
     }
 
     onAdvancedUpload(event: any): void {
-        console.log(event)
         let xhr: XMLHttpRequest = event?.xhr
         let res = JSON.parse(xhr.response)
         store.dispatch('upLoading', false)
-        console.log(res)
         if (res.Status == '0') {
             this.copyData.image = res.ImageName
             return;
@@ -351,12 +367,14 @@ export default class EditCopyView extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.copyData.StartYMD = (window.document.getElementById('StartYMD') as any).value
+            // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.copyData.EndYMD = (window.document.getElementById('EndYMD') as any).value
+            // $( "#EndYMD" ).datepicker( "hide" );
         }, 150)
     }
 
@@ -367,17 +385,19 @@ export default class EditCopyView extends Vue {
      changeDate(value: any): void {
         if(value.value == '') return;
         let date = value.value
+        
         if (date?.length == 4) {
-        date = moment(date, "MMDD").format('YYYY/MM/DD')
+            date = moment(date, "MMDD").format('YYYY/MM/DD')
         }
         
         if (date?.length == 8) {
-        date = moment(date, "YYYYMMDD").format('YYYY/MM/DD')
+            date = moment(date, "YYYYMMDD").format('YYYY/MM/DD')
         }
         
         if (date == 'Invalid date' || date?.length != 10) {
-        date = ''
-        alert('日期格式錯誤')
+            date = ''
+            // alert('日期格式錯誤')
+            store.commit('setErrorMessage', '日期格式錯誤')
         }
         
         value.id == 'StartYMD' ? this.copyData.StartYMD = date : this.copyData.EndYMD = date

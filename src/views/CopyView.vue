@@ -50,9 +50,9 @@
           <div>
             <span><span class="ask-red">*</span>期間：</span>
             <div>
-              <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="query.StartYMD" required />
+              <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="query.StartYMD" autocomplete="no-autofill" required />
               ～
-              <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="query.EndYMD" required />
+              <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="query.EndYMD" autocomplete="no-autofill" required />
               <span class="ask-red" style="margin-left: 10px; margin-top: 10px; font-weight: bold; font-size: 14px;">(限查2年資料)</span>
             </div>
           </div>
@@ -163,6 +163,15 @@ export default class CopyView extends Vue {
             dateFormat: "yy/mm/dd"
         });
     });
+
+    setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#StartYMD" ).datepicker( "hide" );
+                    $( "#EndYMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
   }
 
   init(): void {
@@ -190,12 +199,14 @@ export default class CopyView extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.query.StartYMD = (window.document.getElementById('StartYMD') as any).value
+            // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.query.EndYMD = (window.document.getElementById('EndYMD') as any).value
+            // $( "#EndYMD" ).datepicker( "hide" );
         }, 150)
     }
 
@@ -258,7 +269,7 @@ export default class CopyView extends Vue {
 
     setTimeout(() => {
       store.dispatch('upLoading', false)
-    }, 150)
+    }, 100)
   }
 
   /**
@@ -278,7 +289,8 @@ export default class CopyView extends Vue {
     
     if (date == 'Invalid date' || date?.length != 10) {
       date = ''
-      alert('日期格式錯誤')
+    //   alert('日期格式錯誤')
+        store.commit('setErrorMessage', '日期格式錯誤')
     }
     
     value.id == 'StartYMD' ? this.query.StartYMD = date : this.query.EndYMD = date

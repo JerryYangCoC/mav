@@ -33,6 +33,7 @@
 
             <div style="display: flex; justify-content: flex-end;" v-else>
                 <input type="button" class="btn" style="--i: url('/img/delete.png')" @click="onRemove()" value="刪除" v-if="remove" />
+                <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportGID()" value="匯出名單" v-if="isEdit == false" />
 
                 <input type="submit" class="btn" style="--i: url('/img/sent.png')" value="確認" />
             </div>
@@ -122,13 +123,24 @@ export default class JourneyTmp210 extends Vue {
     }
     isEdit!: boolean;
 
+    created(): void {
+        if (this.value.ActivityList && this.value.ActivityList.length > 0) {
+            this.selectActivity.CopCode = this.value.ActivityList[0].ActivityNo
+            this.selectActivity.CopDesc = this.value.ActivityList[0].ActivityNm
+        }
+    }
+
     onClick(): void {
         if (this.value.ActivityType != '0') {
             if (!this.selectActivity.CopCode) return;
-            this.value.ActivityList?.push({
+            this.value.ActivityList = [{
                 ActivityNo: this.selectActivity.CopCode,
                 ActivityNm: this.selectActivity.CopDesc
-            })
+            }];
+            // this.value.ActivityList?.push({
+            //     ActivityNo: this.selectActivity.CopCode,
+            //     ActivityNm: this.selectActivity.CopDesc
+            // })
         }
 
 
@@ -192,6 +204,11 @@ export default class JourneyTmp210 extends Vue {
 
     copyList(): any {
         return store.state.journey.journeyActivityList;
+    }
+
+    onExportGID(): void {
+        store.dispatch('upLoading', true)
+        store.dispatch('getJourneyCheckGID', this.value.Import)
     }
 }
 </script>

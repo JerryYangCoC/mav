@@ -41,12 +41,12 @@
 
                 <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>有效起日：</span>
-                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="copyData.StartYMD" required />
+                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" autocomplete="no-autofill" v-model="copyData.StartYMD" required />
                 </div>
 
                 <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>有效訖日：</span>
-                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="copyData.EndYMD" required />
+                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" autocomplete="no-autofill" v-model="copyData.EndYMD" required />
                 </div>
             </div>
 
@@ -305,6 +305,16 @@ export default class AddCopyView extends Vue {
                 dateFormat: "yy/mm/dd"
             });
         });
+
+
+        setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#StartYMD" ).datepicker( "hide" );
+                    $( "#EndYMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
     }
 
     /**
@@ -364,13 +374,15 @@ export default class AddCopyView extends Vue {
                     switch(res.data?.Status) {
                         case '0':
                             // 成功
-                            alert('新增成功')
+                            // alert('新增成功')
+                            store.commit('setErrorMessage', '新增成功')
                             this.init();
                             break;
 
                         case '1':
                             // 失敗
-                            alert(res.data?.Message);
+                            // alert(res.data?.Message);
+                            store.commit('setErrorMessage', res.data?.Message)
                             store.dispatch('upSess')
                             break;
 
@@ -424,7 +436,8 @@ export default class AddCopyView extends Vue {
                 }
             }).catch((err) => {
                 console.log(err)
-                alert('複製文案失敗')
+                // alert('複製文案失敗')
+                store.commit('setErrorMessage', '複製文案失敗')
             })
     }
 
@@ -448,11 +461,9 @@ export default class AddCopyView extends Vue {
      * @param event 檔案
      */
     onAdvancedUpload(event: any): void {
-        console.log(event)
         let xhr: XMLHttpRequest = event?.xhr
         let res = JSON.parse(xhr.response)
         store.dispatch('upLoading', false)
-        console.log(res)
         if (res.Status == '0') {
             this.copyData.image = res.ImageName
             return;
@@ -498,12 +509,14 @@ export default class AddCopyView extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.copyData.StartYMD = (window.document.getElementById('StartYMD') as any).value
+            // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.copyData.EndYMD = (window.document.getElementById('EndYMD') as any).value
+            // $( "#EndYMD" ).datepicker( "hide" );
         }, 150)
     }
 
@@ -514,17 +527,19 @@ export default class AddCopyView extends Vue {
     changeDate(value: any): void {
         if(value.value == '') return;
         let date = value.value
+        
         if (date?.length == 4) {
-        date = moment(date, "MMDD").format('YYYY/MM/DD')
+            date = moment(date, "MMDD").format('YYYY/MM/DD')
         }
         
         if (date?.length == 8) {
-        date = moment(date, "YYYYMMDD").format('YYYY/MM/DD')
+            date = moment(date, "YYYYMMDD").format('YYYY/MM/DD')
         }
         
         if (date == 'Invalid date' || date?.length != 10) {
-        date = ''
-        alert('日期格式錯誤')
+            date = ''
+            // alert('日期格式錯誤')
+            store.commit('setErrorMessage', '日期格式錯誤')
         }
         
         value.id == 'StartYMD' ? this.copyData.StartYMD = date : this.copyData.EndYMD = date

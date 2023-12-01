@@ -8,7 +8,7 @@
             <!-- 內頁 -->
             <div :class="'l-div'">
                 <!-- 左方塊 -->
-                <div :style="journeyData.Content?.length < 12 ? 'padding-right: 100vw;' : ''" class="tree" @dragover="allowDrop" @drop="dropTrigger($event)">
+                <div :style="journeyData.Content?.length < 15 ? 'padding-right: 80vw;' : ''" class="tree" @dragover="allowDrop" @drop="dropTrigger($event)">
                     <!-- 旅程樹 -->
                     <div v-for="(item, index) of createTree()" :key="index" :style="{'grid-column-start': item.column, 'grid-row-start': item.row}">
                         <div v-html="item.value" @click="(() => { bottomDivView = true; selectContent = item?.data; })"></div>
@@ -36,7 +36,7 @@
                                         <input type="button" class="btn" style="--i: url('/img/sent.png'); width: 100px;" @click="onCreate()" value="資料送出" />
                                     </div>
                                 </div>
-                                <JourneyTmp101 :isEdit="false"  :dd="query" :active="(() => {
+                                <JourneyTmp101   :dd="query" :active="(() => {
                                         journeyData.JourneyName = query.JourneyName
                                         journeyData.StartDate = query.StartDate
                                         journeyData.EndDate = query.EndDate
@@ -44,7 +44,7 @@
                                         selectContent = null;
                                         bottomDivView = false;
                                     })" v-if="selectContent?.NodeType == '101'"></JourneyTmp101>
-                                <JourneyTmp102 :isEdit="false"  :dd="journeyData" :value="selectContent" :active="(() => {
+                                <JourneyTmp102   :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.PeopleLimt = selectContent.PeopleLimt
@@ -59,7 +59,7 @@
                                             }
                                         });
                                     })" v-if="selectContent?.NodeType == '102'"></JourneyTmp102>
-                                <JourneyTmp103 :isEdit="false"  :dd="journeyData" :value="selectContent" :active="(() => {
+                                <JourneyTmp103   :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.SendType = selectContent.SendType
@@ -72,7 +72,7 @@
                                             }
                                         })
                                     })" :remove="(() => {onRemove()})" v-if="selectContent?.NodeType == '103'"></JourneyTmp103>
-                                <JourneyTmp104 :isEdit="false"  :dd="journeyData" :value="selectContent" :active="(() => {
+                                <JourneyTmp104   :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.PeopleLimt = selectContent.PeopleLimt
@@ -87,7 +87,7 @@
                                             }
                                         });
                                     })" v-if="selectContent?.NodeType == '104'"></JourneyTmp104>
-                                <JourneyTmp106 :isEdit="false"  :dd="journeyData" :value="selectContent" :active="(() => {
+                                <JourneyTmp106   :dd="journeyData" :value="selectContent" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.PeopleLimt = selectContent.PeopleLimt
@@ -102,7 +102,7 @@
                                             }
                                         });
                                     })" v-if="selectContent?.NodeType == '106'"></JourneyTmp106>
-                                <JourneyTmp107 :isEdit="false"  :dd="journeyData" :type="importType" :active="(() => {
+                                <JourneyTmp107   :dd="journeyData" :type="importType" :active="(() => {
                                         dataTree.forEach((ver: JourneyNodeModel) => {
                                             if (ver.NodeId == selectContent?.NodeId) {
                                                 ver.JudgeType = selectContent.JudgeType
@@ -118,7 +118,7 @@
                                             }
                                         });
                                     })" :remove="(() => {onRemove()})" :value="selectContent" v-if="selectContent?.NodeType == '107'"></JourneyTmp107>
-                                <JourneyTmp108 :isEdit="false"  :dd="journeyData" :active="(() => {
+                                <JourneyTmp108   :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             let p = new Array<string>()
@@ -383,7 +383,7 @@
                                                             })
                                                             journeyData.Content.push({
                                                                 NodeId: endId.toString(),
-                                                                NodeName: chaLabel[i],
+                                                                NodeName: chaLabel[i].replace(/有/g, ''),
                                                                 NodeType: chaType[i],
                                                                 // NodeSeq: seqNum + '-' + (i + 1).toString(),
                                                                 NodeSeq: seqNum + '-' + seqI,
@@ -412,11 +412,38 @@
                                             }
                                             selectContent = null;
                                             bottomDivView = false;
+                                            return
                                         }
                                     });
 
-                                })" :remove="(() => {onRemove()})" :value="selectContent" v-if="selectContent?.NodeType == '108'"></JourneyTmp108>
-                                <JourneyTmp201 :isEdit="false"  :dd="journeyData" :value="selectContent" :active="(() => {
+                                })" :remove="(() => {
+                                    confirm.require({
+                                        message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
+                                        header: '確認',
+                                        acceptClass: 'p-button-danger',
+                                        acceptLabel: '取消',
+                                        rejectLabel: '確認',
+                                        reject: () => {
+                                            dataTree.forEach((ver: JourneyNodeModel) => {
+                                                if (ver.NodeId == selectContent?.NodeId) {
+                                                    let seqNum = '1'
+                                                    dataTree.forEach((j: JourneyNodeModel) => {
+                                                        if (j.NodeId == ver.Position[ver.Position.length - 1].target.toString()) {
+                                                            let seq = j.NodeSeq?.split('-') ?? ['1']
+                                                            let seqE = seq[seq.length - 1] ?? '1'
+
+                                                            seqNum = j.NodeSeq?.slice(0, j.NodeSeq.length - seqE.length - 1) ?? ''
+                                                        }
+                                                    })
+
+                                                    seqList = [seqNum, ...seqList]
+                                                    remove()
+                                                }
+                                            })
+                                        }
+                                    });
+                                })" :value="selectContent" v-if="selectContent?.NodeType == '108'"></JourneyTmp108>
+                                <JourneyTmp201   :dd="journeyData" :value="selectContent" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.CouponList = selectContent.CouponList
@@ -427,7 +454,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -440,7 +467,7 @@
                                             }
                                         });
                                     })" v-if="selectContent?.NodeType == '201'"></JourneyTmp201>
-                                <JourneyTmp202 :isEdit="false"  :dd="journeyData" :active="(() => {
+                                <JourneyTmp202   :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.CouponsList = selectContent.CouponsList
@@ -450,7 +477,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -463,7 +490,7 @@
                                             }
                                         });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '202'"></JourneyTmp202>
-                                <JourneyTmp203 :isEdit="false"  :dd="journeyData" :active="(() => {
+                                <JourneyTmp203   :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.SelectDate = selectContent.SelectDate
@@ -473,7 +500,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -486,7 +513,7 @@
                                             }
                                         });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '203'"></JourneyTmp203>
-                                <JourneyTmp204 :isEdit="false"  :dd="journeyData" :active="(() => {
+                                <JourneyTmp204   :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.NewMemStartYMD = selectContent.NewMemStartYMD
@@ -497,7 +524,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -510,7 +537,7 @@
                                             }
                                         });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '204'"></JourneyTmp204>
-                                <JourneyTmp205 :isEdit="false"  :dd="journeyData" :active="(() => {
+                                <JourneyTmp205   :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.NewMemSelectDate = selectContent.NewMemSelectDate
@@ -520,7 +547,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -533,7 +560,7 @@
                                             }
                                         });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '205'"></JourneyTmp205>
-                                <JourneyTmp206 :isEdit="false"  :dd="journeyData" :active="(() => {
+                                <JourneyTmp206   :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.ProductList = selectContent.ProductList
@@ -546,7 +573,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -559,7 +586,7 @@
                                             }
                                         });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '206'"></JourneyTmp206>
-                                <JourneyTmp207 :isEdit="false"  :dd="journeyData" :active="(() => {
+                                <JourneyTmp207   :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.SelectDate = selectContent.SelectDate
@@ -569,7 +596,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -582,7 +609,7 @@
                                             }
                                         });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '207'"></JourneyTmp207>
-                                <JourneyTmp208 :isEdit="false"  :dd="journeyData" :active="(() => {
+                                <JourneyTmp208   :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.SelectDate = selectContent.SelectDate
@@ -592,7 +619,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -605,7 +632,7 @@
                                             }
                                         });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '208'"></JourneyTmp208>
-                                <JourneyTmp209 :isEdit="false"  :dd="journeyData" :active="(() => {
+                                <JourneyTmp209   :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.DateType = selectContent.DateType
@@ -618,7 +645,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -631,7 +658,7 @@
                                             }
                                         });
                                     })" :value="selectContent" v-if="selectContent?.NodeType == '209'"></JourneyTmp209>
-                                <JourneyTmp210 :isEdit="false" :dd="journeyData" :active="(() => {
+                                <JourneyTmp210  :dd="journeyData" :active="(() => {
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             ver.ActivityType = selectContent.ActivityType
@@ -644,7 +671,7 @@
                                     });
                                     })" :remove="(() => {
                                         confirm.require({
-                                            message: '請確認是否「刪除」！',
+                                            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
                                             header: '確認',
                                             acceptClass: 'p-button-danger',
                                             acceptLabel: '取消',
@@ -734,7 +761,7 @@
             </div>
         </div>
     </div>
-    <ConfirmDialog></ConfirmDialog>
+    <ConfirmDialog :closable="false"></ConfirmDialog>
 </template>
 
 <script lang="ts">
@@ -914,22 +941,13 @@ export default class HomeView extends Vue {
      * 初始化
      */
     created(): void {
-        console.log('new')
-        $( function() {
-            $( "#StartYMD" ).datepicker({
-                dateFormat: "yy/mm/dd"
-            });
-            $( "#EndYMD" ).datepicker({
-                dateFormat: "yy/mm/dd"
-            });
-        });
+        console.log('new journey')
 
-        console.log(store.state.journey.journeyMapSample)
         if (store.state.journey.journeyMapSample) {
             this.journeyData = store.state.journey.journeyMapSample
             this.query.JourneyId = this.journeyData.JourneyId?.toString()
             this.query.JourneyName = this.journeyData.JourneyName.toString()
-            this.query.JourneyType = this.journeyData.JourneyType.toString()
+            this.query.JourneyType = this.journeyData.JourneyType?.toString()
             this.query.StartDate = this.journeyData.StartDate.toString()
             this.query.EndDate = this.journeyData.EndDate.toString()
             this.query.StatusFlag = this.journeyData.StatusFlag?.toString()
@@ -945,14 +963,16 @@ export default class HomeView extends Vue {
             this.journeyData.Content = JSON.parse(this.journeyData.Content)
             this.journeyData.JourneyType = this.journeyData.Content[0].NodeType.slice(1)
             this.query.JourneyType = this.journeyData.JourneyType
+
+            this.endId = 1;
+            this.journeyData.Content.forEach((ver: JourneyNodeModel) => {
+                if (this.endId <= Number(ver.NodeId)) this.endId = Number(ver.NodeId) + 1;
+            })
         }
         this.dataTree = this.journeyData.Content;
         let column = 1;
         let row = 1;
-        let row1 = 1;
-        let rowCont = 1;
         let lists: [ { [name: string]: any }] = [{value: this.btn('基本設定', 'setting', 'A', ''), data: { NodeId: '0', NodeName: '基本設定', NodeType: '101', }, column: column, row: 1}];
-        let useList: Array<string> = [];
     
         lists.push({value: this.ALine(), column: column+1, row: 1})
 
@@ -962,17 +982,15 @@ export default class HomeView extends Vue {
         this.col = 1;
         this.row = 1;
         let contentList = new Array<string>();
-        if (this.dataTree.length > 0) this.forTree(lists, '1', column, row, 0, 1, contentList)
+        if (this.dataTree.length > 0) this.forTree(lists, '1', column, row, 1, contentList)
 
         return lists;
     }
 
-    forTree(data: any, value: string, col: number, row: number, n: number, cnt: number, ctl: Array<string>): void {
+    forTree(data: any, value: string, col: number, row: number, cnt: number, ctl: Array<string>): void {
         for (const item of this.dataTree) {
             if (item.NodeId == value) {
-                // console.log(this.useId)
-                console.log('item', item)
-                if (item.NodeType == '105') n--;
+                // console.log('item', item)
                 data.push({value: this.category(item), data: item, column: col, row: this.row})
                 row = this.row
                 
@@ -982,8 +1000,6 @@ export default class HomeView extends Vue {
                         if (this.useId.length > 0 && item.NodeId == this.useId[0].split('-')[0]) {
                             data.push({value: this.Dbtn(), column: col + 2, row: this.row})
                         }
-                    } else {
-                        // n--;
                     }
                 } else if (item.Position.length > 1) {
                     ctl = item.Position.map((v: PositionModel) => {
@@ -1006,13 +1022,11 @@ export default class HomeView extends Vue {
                         }
                     } else if (item.NodeType == '107') {
                         if (this.useId.length > 0 && ip.SeqId.slice(1) == this.useId[0]) {
-                            data.push({value: this.Dbtn(), column: col + 2, row: this.row})
+                            data.push({value: this.Dbtn(), column: col, row: this.row})
                         }
                     }
                     
-
-                    this.forTree(data, ip.target.toString(), col, row, n, cnt, ctl)
-                    n++;
+                    this.forTree(data, ip.target.toString(), col, row, cnt, ctl)
                 })
             }
         }
@@ -1023,7 +1037,8 @@ export default class HomeView extends Vue {
      */
     onCreate(): void {
         if (this.useId?.length > 0) {
-            return alert('尚未完成旅程建檔')
+            // return alert('尚未完成旅程建檔')
+            return store.commit('setErrorMessage', '尚未完成旅程建檔')
         }
         store.dispatch('upLoading', true)
         console.log(this.journeyData)
@@ -1039,13 +1054,15 @@ export default class HomeView extends Vue {
                     switch(res.data?.Status) {
                         case '0':
                             // 成功
-                            alert('新增成功')
+                            // alert('新增成功')
+                            store.commit('setErrorMessage', '新增成功')
                             this.$router.push({path: 'journey', query: this.$router.currentRoute.value.query});
                             break;
 
                         case '1':
                             // 失敗
-                            alert(res.data?.Message);
+                            // alert(res.data?.Message);
+                            store.commit('setErrorMessage', res.data?.Message)
                             store.dispatch('upSess')
                             break;
 
@@ -1061,7 +1078,7 @@ export default class HomeView extends Vue {
 
     onRemove(): void {
         this.confirm.require({
-            message: '請確認是否「刪除」！',
+            message: '刪除此節點後,此節點與後續節點皆需要重新建檔',
             header: '確認',
             acceptClass: 'p-button-danger',
             acceptLabel: '取消',
@@ -1080,6 +1097,13 @@ export default class HomeView extends Vue {
                 }
             })
         })
+        if (this.selectContent && this.selectContent.NodeType == '105') {
+            this.journeyData.Content.forEach((v2: JourneyNodeModel) => {
+                if (v2.NodeSeq && v2.Position[0].target == this.selectContent?.NodeId) {
+                    this.seqList = [v2.NodeSeq, ...this.seqList]
+                }
+            })
+        }
         this.removeNode(this.selectContent?.NodeId ?? '')
         this.selectContent = null
         this.bottomDivView = false
@@ -1091,7 +1115,7 @@ export default class HomeView extends Vue {
             if(v.NodeId == value) {
                 if (v.NodeSeq) {
                     this.seqList = this.seqList.filter((s: string) => s != v.NodeSeq)
-                    if (!this.seqList.includes(v.NodeSeq.slice(0, v.NodeSeq.length - 2)) && v.NodeSeq.slice(0, v.NodeSeq.length - 2) != '1') {
+                    if (!this.seqList.includes(v.NodeSeq.slice(0, v.NodeSeq.length - 2)) && v.NodeSeq.slice(0, v.NodeSeq.length - 2) != '1' && this.selectContent?.NodeType != '108') {
                         this.seqList = [v.NodeSeq.slice(0, v.NodeSeq.length - 2), ...this.seqList]
                     }
                 }
@@ -1214,16 +1238,14 @@ export default class HomeView extends Vue {
     dropTrigger(e: any): void {
         this.allowDrop(e);
         const dragText = e.dataTransfer.getData("Text");
-        // console.log(dragText)
-        // console.log(this.useId)
-        // console.log(this.endId)
 
         if (this.selectContent && (
             this.selectContent.NodeType !== '105' &&
             this.selectContent.NodeType !== '109' &&
             this.selectContent.NodeType !== '110' &&
             this.selectContent.NodeType !== '111'
-            )) return alert('此節點無法連結');
+            // )) return alert('此節點無法連結');
+            )) return store.commit('setErrorMessage', '此節點無法連結')
 
         if (this.useId.length > 0 && dragText == '結束') {
             const uId = this.useId[0].split('-')[0].toString();
@@ -1262,7 +1284,8 @@ export default class HomeView extends Vue {
                         this.useId.splice(0, 1)
                         return;
                     } else {
-                        return alert('此節點無法連結');
+                        // return alert('此節點無法連結');
+                        return store.commit('setErrorMessage', '此節點無法連結')
                     }
                 }
             })
@@ -1609,12 +1632,14 @@ export default class HomeView extends Vue {
                                 this.endId ++;
                                 return;
                             } else {
-                                return alert('此節點無法連結');
+                                // return alert('此節點無法連結');
+                                return store.commit('setErrorMessage', '此節點無法連結')
                             }
                         }
                     })
                 } else {
-                    return alert('此節點無法連結');
+                    // return alert('此節點無法連結');
+                    return store.commit('setErrorMessage', '此節點無法連結')
                 }
                 break;
 
@@ -1666,12 +1691,14 @@ export default class HomeView extends Vue {
                                 // this.endId ++;
                                 return;
                             } else {
-                                return alert('此節點無法連結');
+                                // return alert('此節點無法連結');
+                                return store.commit('setErrorMessage', '此節點無法連結')
                             }
                         }
                     })
                 } else {
-                    return alert('此節點無法連結'); 
+                    // return alert('此節點無法連結'); 
+                    return store.commit('setErrorMessage', '此節點無法連結')
                 }
                 break;
 
@@ -1698,7 +1725,8 @@ export default class HomeView extends Vue {
                                 // this.endId ++;
                                 return;
                             } else {
-                                return alert('此節點無法連結');
+                                // return alert('此節點無法連結');
+                                return store.commit('setErrorMessage', '此節點無法連結')
                             }
                         }
                     })
@@ -1737,7 +1765,7 @@ export default class HomeView extends Vue {
      */
     btn(text: string, img: string, type: string, seq: string) {
         return `
-            <div>
+            <div style="margin-left: 6px;">
                 <div style="${seq ? 'min-width: 60px; text-align: center; margin-top: -25px; width: max-content;' : 'display: none'}">
                     <span class="f-12">${ seq }</span>
                 </div>
@@ -1938,15 +1966,10 @@ export default class HomeView extends Vue {
     }
 
     .content {
-        // padding-bottom: 0;
         display: flex;
         margin-left: auto;
         margin-right: auto;
         max-width: 100vw;
-        // padding-bottom: 3rem;
-        // padding-top: 1rem;
-        // padding-left: 1rem;
-        // padding-right: 1rem;
         color: rgba(55, 65, 81, 1);
         width: 100%;
         border: 1px solid #ccc;
@@ -1982,10 +2005,9 @@ export default class HomeView extends Vue {
         margin: auto 0;
         display: grid;
         height: 80vh;
-        padding: 32px 20vw 280px 0;
+        padding: 32px 25vw 280px 0;
         margin-right: 10vw;
         overflow: auto;
-        // grid-template-rows: 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px 160px;
         grid-auto-rows: 160px;
     }
 

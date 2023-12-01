@@ -9,6 +9,7 @@ export default createStore({
     copy: moduleCopy.state,
     journey: moduleJourney.state,
     loading: false,
+    errorMessage: null,
   },
   getters: {
   },
@@ -18,6 +19,9 @@ export default createStore({
     },
     setLoading(state: any, data: any): void {
       state.loading = data
+    },
+    setErrorMessage(state: any, data: string): void {
+        state.errorMessage = data
     },
   },
   actions: {

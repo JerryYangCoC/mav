@@ -11,9 +11,9 @@
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>商品消費期間：</span>
                 <div>
-                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.PayStartYMD" required :disabled="isEdit" />
+                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.PayStartYMD" autocomplete="no-autofill" required :disabled="isEdit" />
                     ～
-                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.PayEndYMD" required :disabled="isEdit" />
+                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.PayEndYMD" autocomplete="no-autofill" required :disabled="isEdit" />
                 </div>
             </div>
 
@@ -99,17 +99,28 @@ export default class JourneyTmp206 extends Vue {
                 dateFormat: "yy/mm/dd"
             });
         });
+
+        setTimeout(() => {
+            (document.getElementById("ui-datepicker-div") as any).addEventListener("click", function(event: any){
+                if (event.target.innerText != 'Prev' && event.target.innerText != 'Next') {
+                    $( "#StartYMD" ).datepicker( "hide" );
+                    $( "#EndYMD" ).datepicker( "hide" );
+                }
+            });
+        }, 300)
     }
 
     onStartYMD(): void {
         setTimeout(() => {
             this.value.PayStartYMD = (window.document.getElementById('StartYMD') as any).value
+            // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.value.PayEndYMD = (window.document.getElementById('EndYMD') as any).value
+            // $( "#EndYMD" ).datepicker( "hide" );
         }, 150)
     }
 
@@ -126,7 +137,8 @@ export default class JourneyTmp206 extends Vue {
       
       if (date == 'Invalid date' || date?.length != 10) {
           date = ''
-          alert('日期格式錯誤')
+        //   alert('日期格式錯誤')
+        store.commit('setErrorMessage', '日期格式錯誤')
       }
       
       return value.id == 'StartYMD' ? this.value.PayStartYMD = date : this.value.PayEndYMD = date
