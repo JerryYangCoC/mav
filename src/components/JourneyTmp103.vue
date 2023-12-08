@@ -4,10 +4,10 @@
             <div style="display: grid; grid-template-columns: 160px auto auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>發送類型：</span>
                 <select v-model="value.SendType" :disabled="isEdit" @change="changeSendType($event.target)">
-                    <option value="0">D-</option>
-                    <option value="1">每月</option>
-                    <option value="2">指定日期</option>
-                    <option value="3">新入會後</option>
+                    <option value="0" v-if="dd.JourneyType == '01' || dd.JourneyType == '02'">D-</option>
+                    <option value="1" v-if="dd.JourneyType == '03' || dd.JourneyType == '07' || dd.JourneyType == '08' || dd.JourneyType == '09'">每月</option>
+                    <option value="2" v-if="dd.JourneyType == '04' || dd.JourneyType == '06' || dd.JourneyType == '09' || dd.JourneyType == '10'">指定日期</option>
+                    <option value="3" v-if="dd.JourneyType == '05'">新入會後</option>
                 </select>
                 <div>
                     <div v-if="value.SendType == '0' || value.SendType == '3'">
@@ -21,7 +21,7 @@
                     </div>
 
                     <div v-if="value.SendType == '2'">
-                        <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="value.SelectTime" autocomplete="no-autofill" required :disabled="isEdit" />
+                        <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="value.SelectTime" autocomplete="off" required :disabled="isEdit" />
                     </div>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                 <!-- <input type="text" v-model="value.SendTime" disabled /> -->
                 <div>
                     <InputMask id="basic" v-model="value.SendTime" mask="99:99" placeholder="HH:MM" :readonly="isEdit" />
-                    <span style="font-size: 12px;">（此欄位非必填，若未填寫，則以排程時間發送）</span>
+                    <span style="font-weight: bold; color: red;">（此欄位非必填，若未填寫，則以排程時間發送）</span>
                 </div>
             </div>
 

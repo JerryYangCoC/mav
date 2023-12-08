@@ -50,10 +50,10 @@
           <div>
             <span><span class="ask-red">*</span>期間：</span>
             <div>
-              <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="query.StartYMD" autocomplete="no-autofill" required />
+              <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="query.StartYMD" autocomplete="off" required />
               ～
-              <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="query.EndYMD" autocomplete="no-autofill" required />
-              <span class="ask-red" style="margin-left: 10px; margin-top: 10px; font-weight: bold; font-size: 14px;">(限查2年資料)</span>
+              <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="query.EndYMD" autocomplete="off" required />
+              <span class="ask-red" style="margin-left: 10px; font-weight: bold;">(限查2年資料)</span>
             </div>
           </div>
         </div>
@@ -172,6 +172,8 @@ export default class CopyView extends Vue {
                 }
             });
         }, 300)
+
+    if (store.state.copy.queryData) this.query = store.state.copy.queryData
   }
 
   init(): void {

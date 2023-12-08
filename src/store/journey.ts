@@ -16,6 +16,7 @@ export const moduleJourney = {
         journeyActivityList: new Array<CouponModel>(),
         journeyMapSample: null,
         journeySingleItemList: new Array<ProductModel>(),
+        queryData: null,
     },
     mutations: {
         setJourneyList(state: any, data: any): void {
@@ -74,6 +75,9 @@ export const moduleJourney = {
             //     state.journeyMapSample = v
             // })
             state.journeyMapSample = data
+        },
+        setJourneyQueryData(state: any, data: any): void {
+            state.queryData = data
         }
     },
     actions: {
@@ -87,6 +91,7 @@ export const moduleJourney = {
                 .then((res) => {
                     console.log('journey', res)
                     if (res.status == 200 && res.data?.Status == '0') {
+                        context.commit('setJourneyQueryData', data)
                         context.commit('setJourneyList', res.data?.JourneyMap_List)
                     } 
                     context.commit('setLoading', false)

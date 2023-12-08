@@ -14,9 +14,9 @@
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>有效期間：</span>
                 <div>
-                    <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="dd.StartDate" autocomplete="no-autofill" :disabled="isEdit" required />
+                    <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="dd.StartDate" autocomplete="off" :disabled="isEdit" required />
                     ～
-                    <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="dd.EndDate" autocomplete="no-autofill" :disabled="isEdit" required />
+                    <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="dd.EndDate" autocomplete="off" :disabled="isEdit" required />
                 </div>
             </div>
     

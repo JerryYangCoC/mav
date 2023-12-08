@@ -17,7 +17,7 @@
 
                 <!-- bottom div -->
                 <Transition name="bottom" mode="out-in">
-                    <div style="z-index: 10; top: 500px; left: 0; background: white; position: fixed;" :style="rightDivView ? 'width: calc(100% - 220px)' : 'width: 100%'" v-if="bottomDivView">
+                    <div style="z-index: 10; top: calc(90vh - 280px + 55px - 12px); left: 0; background: white; position: fixed;" :style="rightDivView ? 'width: calc(100% - 220px)' : 'width: 100%'" v-if="bottomDivView">
                         <div style="height: 280px; box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 10px; text-align: left;">
                             <div style="padding: 8px; display: flex; align-items: center;" :class="checkBDivClass(selectContent?.NodeType)">
                                 <button :class="selectContent?.NodeType == '105' ? 'bg-purple' : 'bg-transparent'" :style="selectContent?.NodeType == '105' ? 'width: 60px' : 'width: 20px'" style="height: 20px; padding: 0; color: white;" @click="bottomDivView = !bottomDivView;">
@@ -1055,6 +1055,8 @@ export default class HomeView extends Vue {
                         case '0':
                             // 成功
                             // alert('新增成功')
+                            store.commit('setJourneyQueryData', null)
+                            store.commit('setJourneyList', [])
                             store.commit('setErrorMessage', '新增成功')
                             this.$router.push({path: 'journey', query: this.$router.currentRoute.value.query});
                             break;
@@ -1571,10 +1573,14 @@ export default class HomeView extends Vue {
 
             case '發送時間':
                 if (this.dataTree.length == 1) {
+                    let type = this.journeyData.JourneyType == '01' || this.journeyData.JourneyType == '02' ? '0' :
+                    this.journeyData.JourneyType == '03' || this.journeyData.JourneyType == '07' || this.journeyData.JourneyType == '08' || this.journeyData.JourneyType == '09' ? '1' :
+                    this.journeyData.JourneyType == '04' || this.journeyData.JourneyType == '06' || this.journeyData.JourneyType == '10' ? '3' : '4'
                     this.dataTree.push({
                         NodeId: "2",
                         NodeName: dragText,
                         NodeType: "103",
+                        SendType: type,
                         Position: [
                             {
                                 "SeqId": "e2-3",
@@ -1588,6 +1594,7 @@ export default class HomeView extends Vue {
                         NodeId: "2",
                         NodeName: dragText,
                         NodeType: "103",
+                        SendType: type,
                         Position: [],
                     };
                     this.bottomDivView = true;
@@ -1978,7 +1985,8 @@ export default class HomeView extends Vue {
 
     .r-div {
         box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 10px;
-        height: 736px;
+        // height: 736px;
+        height: 90vh;
         width: 220px;
         position: relative;
         overflow-x: hidden;
@@ -1991,7 +1999,8 @@ export default class HomeView extends Vue {
         padding-right: 30px;
         box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 10px;
         /* border-radius: 10px; */
-        height: 736px;
+        // height: 736px;
+        height: 90vh;
         width: 100%;
         // margin-bottom: 25px;
         position: relative;

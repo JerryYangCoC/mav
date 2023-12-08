@@ -7,7 +7,6 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import Paginator from "primevue/paginator";
-import Dialog from 'primevue/dialog';
 import store from '@/store';
 
 @Options({

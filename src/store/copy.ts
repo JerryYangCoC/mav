@@ -7,6 +7,7 @@ export const moduleCopy = {
         lists: new Array<CopyListModel>(),
         copyDetail: null,
         copyList: new Array<CopyListModel>(),
+        queryData: null,
     },
     mutations: {
         setCopy(state: any, data: any): void {
@@ -32,6 +33,9 @@ export const moduleCopy = {
             data?.forEach((v) => {
                 state.copyDetail = v
             });
+        },
+        setCopyQueryData(state: any, data: any): void {
+            state.queryData = data
         }
     },
     actions: {
@@ -40,6 +44,7 @@ export const moduleCopy = {
                 .then((res) => {
                     console.log('copy', res)
                     if (res.status == 200 && res.data?.Status == '0') {
+                        context.commit('setCopyQueryData', data)
                         context.commit('setCopy', res.data?.CopyWrite_List)
                     }
                     context.commit('setLoading', false)

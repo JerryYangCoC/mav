@@ -50,7 +50,7 @@
             </DataTable>
 
             <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-                <input type="button" class="btn" style="--i: url('/img/back.png')" @click="queryView = false;" value="返回" />
+                <input type="button" class="btn" style="--i: url('img/back.png')" @click="queryView = false;" value="返回" />
             </div>
         </div>
     </Dialog>
@@ -58,10 +58,13 @@
 
     <Dialog v-model:visible="queryActivityView" modal :show-header="false" :style="{ width: '60vw' }">
         <div class="box-copy">
-            <div style="text-align: center;">
-                <input type="text" style="width: 200px;" v-model="query.ActionID" placeholder="編號" @change="onSearch()" />
-                <input type="text" style="width: 200px;" v-model="query.ActionName" placeholder="名稱" @change="onSearch()" />
-                <!-- <button @click="queryView = false">返回</button> -->
+            <div style="text-align: center; display: flex;">
+                <input type="text" style="width: 200px;" v-model="query.ActionID" placeholder="編號" />
+                <input type="text" style="width: 200px;" v-model="query.ActionName" placeholder="名稱" />
+                <!-- <input type="button" class="btn-def" @click="onSearch()" value="搜尋" />
+                <input type="button" class="btn-def" @click="queryActivityView = false;" value="返回" /> -->
+                <input type="button" class="btn" style="--i: url('/img/search.png')" @click="onSearch()" value="搜尋" />
+                <input type="button" class="btn" style="--i: url('/img/back.png')" @click="queryActivityView = false;" value="返回" />
             </div>
             <TreeTable
                 :value="copyList()"

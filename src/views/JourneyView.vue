@@ -27,9 +27,9 @@
                 <div>
                     <span><span class="ask-red">*</span>期間：</span>
                     <div>
-                        <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="query.StartDate" autocomplete="no-autofill" required />
+                        <input type="text" id="StartYMD" @blur="onStartYMD()" @change="changeDate($event.target)" v-model="query.StartDate" autocomplete="off" required />
                         ～
-                        <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="query.EndDate" autocomplete="no-autofill" required />
+                        <input type="text" id="EndYMD" @blur="onEndYMD()" @change="changeDate($event.target)" v-model="query.EndDate" autocomplete="off" required />
                     </div>
                 </div>
 
@@ -38,7 +38,14 @@
                     <input type="text" v-model="query.JourneyId" />
                 </div>
 
-                <div></div>
+                <div>
+                    <span><span class="ask-red">*</span>狀態：</span>
+                    <select v-model="query.StatusFlag">
+                        <option value="">全選</option>
+                        <option value="0">啟用</option>
+                        <option value="1">未啟用</option>
+                    </select>
+                </div>
 
                 <div>
                     <span>旅程名稱：</span>
@@ -87,6 +94,11 @@
                     <Column field="JourneyName" header="旅程名稱"></Column>
                     <Column field="StartYMD" header="有效起日"></Column>
                     <Column field="EndYMD" header="有效訖日"></Column>
+                    <Column field="StatusFlag" header="狀態">
+                        <template #body="slotProps">
+                            {{ slotProps.node.data.StatusFlag == '0' ? '啟用' : '未啟用' }}
+                        </template>
+                    </Column>
                     <Column header="功能" style="width: 140px;">
                         <template #body="slotProps">
                             <div style="display: flex; justify-content: space-between;">
@@ -218,7 +230,8 @@ export default class JourneyView extends Vue {
         JourneyName: '',
         JourneyType: '',
         StartDate: '',
-        EndDate: ''
+        EndDate: '',
+        StatusFlag: '',
     };
     confirm = useConfirm();
     addView = false;
@@ -249,6 +262,7 @@ export default class JourneyView extends Vue {
         }, 300)
         
         store.commit('setJourneyMapSample', null)
+        if (store.state.journey.queryData) this.query = store.state.journey.queryData
     }
 
     /**
@@ -260,7 +274,8 @@ export default class JourneyView extends Vue {
             JourneyName: '',
             JourneyType: '',
             StartDate: '',
-            EndDate: ''
+            EndDate: '',
+            StatusFlag: '',
         }
 
         store.commit('setJourneyList', [])

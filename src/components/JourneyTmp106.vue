@@ -15,7 +15,10 @@
     
                 <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;">
                     <span>發送人數上限：</span>
-                    <input type="text" style="width: 150px;" v-model="value.PeopleLimt" :disabled="isEdit" />
+                    <div>
+                        <input type="text" style="width: 150px;" v-model="value.PeopleLimt" :disabled="isEdit" />
+                        <span style="font-weight: bold; color: red;">（0為無上限）</span>
+                    </div>
                 </div>
             </div>
 
@@ -72,7 +75,7 @@
             
             <div style="display: flex; justify-content: flex-end;" v-else>
                 <input type="button" class="btn" style="--i: url('/img/search.png'); width: 100px;" @click="onPreview()" value="預覽文案" />
-                <input type="button" class="btn" style="--i: url('/img/sent.png')" @click="onStash()" value="暫存" />
+                <input type="button" class="btn" style="--i: url('/img/sent.png'); width: 100px;" @click="onStash()" value="試算人數" />
 
                 <input type="submit" class="btn" style="--i: url('/img/sent.png')" value="確認" />
             </div>
@@ -81,10 +84,13 @@
 
     <Dialog v-model:visible="queryActivityView" modal :show-header="false" :style="{ width: '60vw' }">
         <div class="box-copy">
-            <div style="text-align: center;">
-                <input type="text" style="width: 200px;" v-model="query.CopyWriteID" placeholder="編號" @change="onSearch()" />
-                <input type="text" style="width: 200px;" v-model="query.CopyWriteName" placeholder="名稱" @change="onSearch()" />
-                <!-- <button @click="queryView = false">返回</button> -->
+            <div style="text-align: center; display: flex;">
+                <input type="text" style="width: 200px;" v-model="query.CopyWriteID" placeholder="編號" />
+                <input type="text" style="width: 200px;" v-model="query.CopyWriteName" placeholder="名稱" />
+                <!-- <input type="button" class="btn-def" @click="onSearch()" value="搜尋" />
+                <input type="button" class="btn-def" @click="queryActivityView = false;" value="返回" /> -->
+                <input type="button" class="btn" style="--i: url('/img/search.png')" @click="onSearch()" value="搜尋" />
+                <input type="button" class="btn" style="--i: url('/img/back.png')" @click="queryActivityView = false;" value="返回" />
             </div>
             <TreeTable
                 :value="copyList()"
@@ -113,7 +119,7 @@
         </div>
 
         <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-            <input type="button" class="btn" style="--i: url('/img/back.png')" @click="copyWriteView = false;" value="返回" />
+            <input type="button" class="btn" style="--i: url('img/back.png')" @click="copyWriteView = false;" value="返回" />
         </div>
     </Dialog>
 </template>
@@ -350,8 +356,12 @@ export default class JourneyTmp106 extends Vue {
         axios.post('http://10.2.126.194:8030/app/v1/api/CDP/JourneyTempPeopleGet', data)
             .then((res) => {
                 console.log('Journey Temp People', res)
-                if (res.status == 200 && res.data?.Status == '0') {
-                    this.tempPeople = res.data.TempPeople
+                if (res.status == 200) {
+                    if (res.data?.Status == '0') {
+                        this.tempPeople = res.data.TempPeople
+                    } else {
+                        store.commit('setErrorMessage', res.data?.Message)
+                    }
                 }
             }).catch((err) => {
                 console.log(err)

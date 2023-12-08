@@ -17,7 +17,7 @@
 
                 <!-- bottom div -->
                 <Transition name="bottom" mode="out-in">
-                    <div style="z-index: 10; top: 500px; left: 0; background: white; position: fixed;" :style="rightDivView ? 'width: calc(100% - 220px)' : 'width: 100%'" v-if="bottomDivView">
+                    <div style="z-index: 10; top: calc(90vh - 280px + 55px - 12px); left: 0; background: white; position: fixed;" :style="rightDivView ? 'width: calc(100% - 220px)' : 'width: 100%'" v-if="bottomDivView">
                         <div style="height: 280px; box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 10px; text-align: left;">
                             <div style="padding: 8px; display: flex; align-items: center;" :class="checkBDivClass(selectContent?.NodeType)">
                                 <button :class="selectContent?.NodeType == '105' ? 'bg-purple' : 'bg-transparent'" :style="selectContent?.NodeType == '105' ? 'width: 60px' : 'width: 20px'" style="height: 20px; padding: 0; color: white;" @click="bottomDivView = !bottomDivView;">
@@ -892,7 +892,7 @@ export default class EditJourneyView extends Vue {
     created(): void {
         console.log('edit journey')
 
-        this.journeyData = store.state.journey.journeyDetail
+        if (store.state.journey.journeyDetail) this.journeyData = store.state.journey.journeyDetail
         if (!this.journeyData) {
             this.$router.push({path: 'journey', query: this.$router.currentRoute.value.query});
             return;
@@ -1012,6 +1012,7 @@ export default class EditJourneyView extends Vue {
                         case '0':
                             // 成功
                             // alert('修改成功')
+                            store.dispatch('getListJourney', store.state.journey.queryData)
                             store.commit('setErrorMessage', '修改成功')
                             this.$router.push({path: 'journey', query: this.$router.currentRoute.value.query});
                             break;
@@ -2394,7 +2395,8 @@ export default class EditJourneyView extends Vue {
 
     .r-div {
         box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 10px;
-        height: 736px;
+        // height: 736px;
+        height: 90vh;
         width: 220px;
         position: relative;
         overflow-x: hidden;
@@ -2407,7 +2409,8 @@ export default class EditJourneyView extends Vue {
         padding-right: 30px;
         box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 10px;
         /* border-radius: 10px; */
-        height: 736px;
+        // height: 736px;
+        height: 90vh;
         width: 100%;
         // margin-bottom: 25px;
         position: relative;

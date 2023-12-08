@@ -33,18 +33,18 @@
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;" v-if="value.JudgeType == '3' || value.JudgeType == '4' || value.JudgeType == '5'">
                 <span><span class="ask-red">*</span>消費期間：</span>
                 <div>
-                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.ConsumeStartYMD" autocomplete="no-autofill" required :disabled="isEdit" />
+                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.ConsumeStartYMD" autocomplete="off" required :disabled="isEdit" />
                     ～
-                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.ConsumeEndYMD" autocomplete="no-autofill" required :disabled="isEdit" />
+                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.ConsumeEndYMD" autocomplete="off" required :disabled="isEdit" />
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;" v-if="value.JudgeType == '6'">
                 <span><span class="ask-red">*</span>排除商品消費期間：</span>
                 <div>
-                    <input type="text" id="RStartYMD" @change="changeDate($event.target)" @blur="onRStartYMD()" v-model="value.RemindedStartYMD" autocomplete="no-autofill" required :disabled="isEdit" />
+                    <input type="text" id="RStartYMD" @change="changeDate($event.target)" @blur="onRStartYMD()" v-model="value.RemindedStartYMD" autocomplete="off" required :disabled="isEdit" />
                     ～
-                    <input type="text" id="REndYMD" @change="changeDate($event.target)" @blur="onREndYMD()" v-model="value.RemindedEndYMD" autocomplete="no-autofill" required :disabled="isEdit" />
+                    <input type="text" id="REndYMD" @change="changeDate($event.target)" @blur="onREndYMD()" v-model="value.RemindedEndYMD" autocomplete="off" required :disabled="isEdit" />
                 </div>
             </div>
 

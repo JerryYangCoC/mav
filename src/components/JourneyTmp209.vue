@@ -13,7 +13,7 @@
                         <span>號</span>
                     </div>
                     <div v-if="value.DateType == '1'">
-                        <input type="text" id="YMD" style="width: 150px;" @change="changeDate($event.target)" @blur="onYMD()" v-model="value.SelectDate" autocomplete="no-autofill" required :disabled="isEdit" />
+                        <input type="text" id="YMD" style="width: 150px;" @change="changeDate($event.target)" @blur="onYMD()" v-model="value.SelectDate" autocomplete="off" required :disabled="isEdit" />
                     </div>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                     <input type="text" style="width: 150px;" v-model="value.PayAmtStart" required :disabled="isEdit" />
                     ～
                     <input type="text" style="width: 150px;" v-model="value.PayAmtEnd" required :disabled="isEdit" />
-                    <span style="font-size: 12px;">（排除當年度已升等會員，消費已達2萬）</span>
+                    <span style="font-weight: bold; color: red;">（排除當年度已升等會員，消費已達2萬）</span>
                 </div>
             </div>
                         

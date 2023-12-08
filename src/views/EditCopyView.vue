@@ -5,7 +5,7 @@
     <div>
         <div class="form-box">
             <div style="display: grid; grid-template-columns: 33% 33%;">
-                <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>文案型態：</span>
                     <select v-model="copyData.CopyWriteType" disabled>
                         <option value="01">01：簡訊</option>
@@ -31,7 +31,7 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 33% 33% 33%;">
-                <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
                     <span>文案編號：</span>
                     <div>
                         <input type="text" v-model="copyData.CopyWriteID" disabled />
@@ -41,29 +41,25 @@
 
                 <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>有效起日：</span>
-                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="copyData.StartYMD" autocomplete="no-autofill" :disabled="!isEdit" />
+                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="copyData.StartYMD" autocomplete="off" :disabled="!isEdit" />
                 </div>
 
                 <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>有效訖日：</span>
-                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="copyData.EndYMD" autocomplete="no-autofill" :disabled="!isEdit" />
+                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="copyData.EndYMD" autocomplete="off" :disabled="!isEdit" />
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 50% 50%;">
-                <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
+            <div>
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>文案名稱：</span>
                     <input type="text" style="width: 250px;" v-model="copyData.CopyWriteName" :disabled="!isEdit" />
                 </div>
 
-                <div v-if="copyData.CopyWriteType == '02'" style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
-                    <span><span class="ask-red">*</span>APP推播標題：</span>
-                    <input type="text" style="width: 250px;" v-model="copyData.title" :disabled="!isEdit" />
-                </div>
             </div>
             
             <div>
-                <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>參數型態：</span>
                     <select v-model="copyData.ParamType" disabled>
                         <option value="00">00：無</option>
@@ -74,7 +70,7 @@
             </div>
 
             <div>
-                <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
                     <span>文案參數：</span>
                     <div>
                         <input type="text" placeholder="參數一" v-model="copyData.Param1" :disabled="!isEdit" />
@@ -86,8 +82,15 @@
                 </div>
             </div>
 
+            <div style="margin-top: -10px;">
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
+                    <span style="font-weight: bold; color: red;">（不可拖曳）</span>
+                    <div></div>
+                </div>
+            </div>
+
             <div v-if="copyData.CopyWriteType == '02'">
-                <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>顯示類型：</span>
                     <select v-model="copyData.type" :disabled="!isEdit">
                         <option value="show">show: 顯示</option>
@@ -97,14 +100,14 @@
             </div>
 
             <div v-if="copyData.CopyWriteType == '02' && copyData.type == 'open'">
-                <div style="display: grid; grid-template-columns: 90px auto;  place-items: center end; justify-content: start;">
+                <div style="display: grid; grid-template-columns: 120px auto;  place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>推播網址：</span>
                     <input type="text" style="width: 80vw;" v-model="copyData.cta_url" :disabled="!isEdit" />
                 </div>
             </div>
 
             <div v-if="copyData.CopyWriteType == '02'">
-                <div style="display: grid; grid-template-columns: 90px auto; place-items: start end; justify-content: start;">
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: start end; justify-content: start;">
                     <span style="padding-top: 8px;">推播圖片：</span>
                     <div style="margin: 6px; min-width: 80vw;">
                         <Toast position='top-center' />
@@ -117,8 +120,8 @@
                             :multiple="true"
                             :fileLimi="1"
                             accept="image/*"
-                            :maxFileSize="2097152"
-                            :invalidFileSizeMessage="'檔案無法上傳，圖片須為(900*900)(檔案大小限制2MB)'"
+                            :maxFileSize="1048576"
+                            :invalidFileSizeMessage="'(建議900*900)(檔案大小限制1MB)(檔案格式為JPG、PNG、JPEG)'"
                             :pt="{
                                 message: { 
                                     root: {
@@ -131,7 +134,7 @@
                                     <div>
                                         <input type="button" style="width: 80px;" @click="onChooseEvent(chooseCallback)" :disabled="files && files.length > 0" value="選擇檔案" />
                                         <input type="button" style="width: 80px;" @click="onUploadEvent(uploadCallback, files, (() => { toast.add({ severity: 'error', detail: '檔案無法上傳，圖片須為(900*900)(檔案大小限制2MB)' }); }))" :disabled="!files || files.length === 0" value="檔案上傳" />
-                                        <span>(900*900)(檔案大小限制2MB)</span>
+                                        <span>(建議900*900)(檔案大小限制1MB)(檔案格式為JPG、PNG、JPEG)</span>
                                     </div>
                                 </div>
                             </template>
@@ -159,8 +162,15 @@
                 </div>
             </div>
 
+            <div v-if="copyData.CopyWriteType == '02'">
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
+                    <span><span class="ask-red">*</span>APP推播標題：</span>
+                    <input type="text" style="width: 250px;" v-model="copyData.title" :disabled="!isEdit" />
+                </div>
+            </div>
+
             <div>
-                <div style="display: grid; grid-template-columns: 90px auto; place-items: start end; justify-content: start;">
+                <div style="display: grid; grid-template-columns: 120px auto; place-items: start end; justify-content: start;">
                     <span style="padding-top: 8px;"><span class="ask-red">*</span>文案內容：</span>
                     <div style="display: grid;">
                         <textarea
@@ -175,7 +185,7 @@
             </div>
 
             <div v-if="copyData.CopyWriteType == '02' && copyData.type == 'open'">
-                <div style="display: grid; grid-template-columns: 90px auto;  place-items: center end; justify-content: start;">
+                <div style="display: grid; grid-template-columns: 120px auto;  place-items: center end; justify-content: start;">
                     <span>按鈕標題：</span>
                     <input type="text" style="width: 80vw;" v-model="copyData.cta_title" :disabled="!isEdit" />
                 </div>
@@ -211,7 +221,8 @@ import Dialog from 'primevue/dialog';
 import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from "primevue/useconfirm";
-import moment from 'moment';;
+import moment from 'moment';
+import $ from 'jquery'
 
 @Options({
     components: {
@@ -260,7 +271,7 @@ export default class EditCopyView extends Vue {
     }
 
     init(): void {
-        this.copyData = store.state.copy.copyDetail
+        if (store.state.copy.copyDetail) this.copyData = store.state.copy.copyDetail
         this.visible = this.copyData.image ? true : false;
     }
 
@@ -301,6 +312,7 @@ export default class EditCopyView extends Vue {
                         case '0':
                             // 成功
                             // alert('修改成功')
+                            store.dispatch('getListCopy', store.state.copy.queryData)
                             store.commit('setErrorMessage', '修改成功')
                             this.onToList();
                             break;
@@ -348,10 +360,10 @@ export default class EditCopyView extends Vue {
         var img = new Image();
         img.onload = function() {
             console.log(img.height, img.width);
-            if (img.height != 900 || img.width != 900) {
-                error()
-                return false;
-            }
+            // if (img.height != 900 || img.width != 900) {
+            //     error()
+            //     return false;
+            // }
             callbark()
         };
         

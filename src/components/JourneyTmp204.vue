@@ -4,9 +4,9 @@
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>新入會期間：</span>
                 <div>
-                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.NewMemStartYMD" autocomplete="no-autofill" required :disabled="isEdit" />
+                    <input type="text" id="StartYMD" @change="changeDate($event.target)" @blur="onStartYMD()" v-model="value.NewMemStartYMD" autocomplete="off" required :disabled="isEdit" />
                     ～
-                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.NewMemEndYMD" autocomplete="no-autofill" required :disabled="isEdit" />
+                    <input type="text" id="EndYMD" @change="changeDate($event.target)" @blur="onEndYMD()" v-model="value.NewMemEndYMD" autocomplete="off" required :disabled="isEdit" />
                 </div>
             </div>
             
