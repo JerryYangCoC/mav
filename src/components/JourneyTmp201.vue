@@ -41,14 +41,8 @@
                 <!-- <input type="button" class="btn-def" @click="queryView = false;" value="返回" /> -->
               
                 <input type="button" class="btn" style="--i: url('/img/search.png')" @click="onSearch()" value="搜尋" />
+                <input type="button" class="btn" style="--i: url('/img/icon_clear.png')" @click="(() => { query = { CopCode: '', CopDesc: '', MoneyType: '0', }; selectedProduct = [] })" value="清除" />
                 <input type="button" class="btn" style="--i: url('/img/back.png')" @click="queryView = false;" value="返回" />
-                <input type="button" class="btn" style="--i: url('/img/icon_clear.png')" @click="(() => {
-                    query = {
-                        CopCode: '',
-                        CopDesc: '',
-                        MoneyType: '0',
-                    }
-                })" value="清除" />
                 <input type="button" class="btn" style="--i: url('/img/sent.png')" @click="onClickProduct()" value="確認" />
             </div>
 

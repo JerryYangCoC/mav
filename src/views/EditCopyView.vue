@@ -63,8 +63,8 @@
                     <span><span class="ask-red">*</span>參數型態：</span>
                     <select v-model="copyData.ParamType" disabled>
                         <option value="00">00：無</option>
-                        <option value="01">01：預定義</option>
-                        <option value="02">02：自定義</option>
+                        <option value="01" v-if="copyData.JourneyType != '04' && copyData.JourneyType != '05' && copyData.JourneyType != '09' && copyData.JourneyType != '10'">01：預定義</option>
+                        <option value="02" v-if="copyData.JourneyType == '01' || copyData.JourneyType == '02' || copyData.JourneyType == '06'">02：自定義</option>
                     </select>
                 </div>
             </div>
@@ -73,11 +73,11 @@
                 <div style="display: grid; grid-template-columns: 120px auto; place-items: center end; justify-content: start;">
                     <span>文案參數：</span>
                     <div>
-                        <input type="text" placeholder="參數一" v-model="copyData.Param1" :disabled="!isEdit" />
-                        <input type="text" placeholder="參數二" v-model="copyData.Param2" :disabled="!isEdit" />
-                        <input type="text" placeholder="參數三" v-model="copyData.Param3" :disabled="!isEdit" />
-                        <input type="text" placeholder="參數四" v-model="copyData.Param4" :disabled="!isEdit" />
-                        <input type="text" placeholder="參數五" v-model="copyData.Param5" :disabled="!isEdit" />
+                        <input type="text" placeholder="參數一" v-model="copyData.Param1" :disabled="copyData.ParamType != '02' && !isEdit" />
+                        <input type="text" placeholder="參數二" v-model="copyData.Param2" :disabled="copyData.ParamType != '02' && !isEdit" />
+                        <input type="text" placeholder="參數三" v-model="copyData.Param3" :disabled="copyData.ParamType != '02' && !isEdit" />
+                        <input type="text" placeholder="參數四" v-model="copyData.Param4" :disabled="copyData.ParamType != '02' && !isEdit" />
+                        <input type="text" placeholder="參數五" v-model="copyData.Param5" :disabled="copyData.ParamType != '02' && !isEdit" />
                     </div>
                 </div>
             </div>
@@ -416,7 +416,7 @@ export default class EditCopyView extends Vue {
     }
 
     changeParam(): void {
-        if (this.copyData.ParamType == '02') return;
+        // if (this.copyData.ParamType == '02') return;
 
         this.copyData.Param1 = ''
         this.copyData.Param2 = ''

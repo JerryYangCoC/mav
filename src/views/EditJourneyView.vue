@@ -17,7 +17,7 @@
 
                 <!-- bottom div -->
                 <Transition name="bottom" mode="out-in">
-                    <div style="z-index: 10; top: calc(90vh - 280px + 55px - 12px); left: 0; background: white; position: fixed;" :style="rightDivView ? 'width: calc(100% - 220px)' : 'width: 100%'" v-if="bottomDivView">
+                    <div style="z-index: 10; top: calc(90vh - 280px + 55px - 20px); left: 0; background: white; position: fixed;" :style="rightDivView ? 'width: calc(100% - 220px)' : 'width: 100%'" v-if="bottomDivView">
                         <div style="height: 280px; box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 10px; text-align: left;">
                             <div style="padding: 8px; display: flex; align-items: center;" :class="checkBDivClass(selectContent?.NodeType)">
                                 <button :class="selectContent?.NodeType == '105' ? 'bg-purple' : 'bg-transparent'" :style="selectContent?.NodeType == '105' ? 'width: 60px' : 'width: 20px'" style="height: 20px; padding: 0; color: white;" @click="bottomDivView = !bottomDivView;">
@@ -118,7 +118,7 @@
                                             }
                                         });
                                     })" :remove="(() => {onRemove()})"  :value="selectContent" v-if="selectContent?.NodeType == '107'"></JourneyTmp107>
-                                <JourneyTmp108 :isEdit="isEdit" :dd="journeyData" :value="selectContent" :active="(() => { 
+                                <JourneyTmp108 :isEdit="isEdit" :edit="(() => { isEdit = false })" :dd="journeyData" :value="selectContent" :active="(() => { 
                                     dataTree.forEach((ver: JourneyNodeModel) => {
                                         if (ver.NodeId == selectContent?.NodeId) {
                                             let p = new Array<string>()
@@ -426,16 +426,20 @@
                                             dataTree.forEach((ver: JourneyNodeModel) => {
                                                 if (ver.NodeId == selectContent?.NodeId) {
                                                     let seqNum = '1'
-                                                    dataTree.forEach((j: JourneyNodeModel) => {
-                                                        if (j.NodeId == ver.Position[ver.Position.length - 1].target.toString()) {
-                                                            let seq = j.NodeSeq?.split('-') ?? ['1']
-                                                            let seqE = seq[seq.length - 1] ?? '1'
 
-                                                            seqNum = j.NodeSeq?.slice(0, j.NodeSeq.length - seqE.length - 1) ?? ''
-                                                        }
-                                                    })
+                                                    if(ver.Position.length > 0) {
+                                                        dataTree.forEach((j: JourneyNodeModel) => {
+                                                            if (j.NodeId == ver.Position[ver.Position.length - 1].target.toString()) {
+                                                                let seq = j.NodeSeq?.split('-') ?? ['1']
+                                                                let seqE = seq[seq.length - 1] ?? '1'
+    
+                                                                seqNum = j.NodeSeq?.slice(0, j.NodeSeq.length - seqE.length - 1) ?? ''
+                                                            }
+                                                        })
 
-                                                    seqList = [seqNum, ...seqList]
+                                                        seqList = [seqNum, ...seqList]
+                                                    }
+
                                                     remove()
                                                 }
                                             })
@@ -688,7 +692,7 @@
                     </div>
             
                     <div style="position: absolute; bottom: 0; left: 50%; z-index: 999; height: 20px;" v-else>
-                        <button style="width: 40px; height: 20px; padding: 0;" class="bg-purple" @click="(() => { bottomDivView = !bottomDivView })">
+                        <button style="width: 40px; height: 20px; padding: 0;" class="bg-orange" @click="(() => { bottomDivView = !bottomDivView })">
                             <img src="/img/less.png" width="20" height="20" />
                         </button>
                     </div>
@@ -707,7 +711,7 @@
                         v-if="rightDivView"
                         >
                         <div style="position: absolute; top: 352px; right: 200px; z-index: 999;">
-                            <button style="width: 20px; padding: 0;" class="bg-purple" @click="(() => { rightDivView = !rightDivView })">
+                            <button style="width: 20px; padding: 0;" class="bg-orange" @click="(() => { rightDivView = !rightDivView })">
                                 <img src="/img/right.png" width="20" height="20" />
                             </button>
                         </div>
@@ -717,11 +721,11 @@
                             <div class="tab-div">
                                 <ul class="nav nav-tabs">
                                     <li class="nav-item">
-                                        <button :class=" stemp == 'B' ? 'nav-link active bg-orange' : 'nav-link bg-white' " @click="(() => { stemp = 'B' })">旅程</button>
+                                        <button :class=" stemp == 'B' ? 'nav-link active bg-orange' : 'nav-link bg-white' " class="f-16" @click="(() => { stemp = 'B' })">旅程</button>
                                     </li>
                                                         
                                     <li class="nav-item">
-                                        <button :class=" stemp == 'A' ? 'nav-link active bg-purple' : 'nav-link bg-white' " @click="(() => { stemp = 'A' })">功能</button>
+                                        <button :class=" stemp == 'A' ? 'nav-link active bg-purple' : 'nav-link bg-white' " class="f-16" @click="(() => { stemp = 'A' })">功能</button>
                                     </li>
                                 </ul>
                             </div>
@@ -740,7 +744,7 @@
                     </div>
             
                     <div style="position: fixed; top: 423px; right: 0; z-index: 999;" v-else>
-                        <button style="width: 20px; padding: 0;" class="bg-purple" @click="(() => { rightDivView = !rightDivView })">
+                        <button style="width: 20px; padding: 0;" class="bg-orange" @click="(() => { rightDivView = !rightDivView })">
                             <img src="/img/left.png" width="20" height="20" />
                         </button>
                     </div>
@@ -1196,6 +1200,106 @@ export default class EditJourneyView extends Vue {
     dragStart(e: any) {
         let tar = e.target.innerText;
         e.dataTransfer.setData("Text", tar);
+    }
+
+
+    checkData(): boolean {
+      let value = false
+      if (!this.journeyData.JourneyName) return true;
+      if (!this.journeyData.StartDate) return true;
+      if (!this.journeyData.EndDate) return true;
+      if (!this.journeyData.StatusFlag) return true;
+
+      this.journeyData.Content.forEach((ver: JourneyNodeModel) => {
+        switch(ver.NodeType) {
+          case '102':
+              if (!ver.PeopleLimt) return value = true;
+              if (!ver.IsRecvMsgFlag) return value = true;
+              if (!ver.SendType) return value = true;
+              if (!ver.RemindedDate) return value = true;
+              if (!ver.CopyWriteId) return  value = true;
+            break;
+
+          case '103':
+              if (!ver.SendType) return  value = true;
+              if (!ver.SelectTime) return  value = true;
+            break;
+
+          case '104':
+              if (!ver.PeopleLimt) return value = true;
+              if (!ver.IsRecvMsgFlag) return value = true;
+              if (!ver.SendType) return value = true;
+              if (!ver.RemindedDate) return value = true;
+              if (!ver.CopyWriteId) return  value = true;
+            break;
+
+          case '106':
+              if (!ver.PeopleLimt) return value = true;
+              if (!ver.IsRecvMsgFlag) return value = true;
+              if (!ver.SendType) return value = true;
+              if (!ver.RemindedDate) return value = true;
+              if (!ver.CopyWriteId) return  value = true;
+            break;
+
+          case '107':
+              if (!ver.JudgeType) return  value = true;
+            break;
+
+          case '108':
+              if (!ver.Channel) return  value = true;
+            break;
+
+          case '201':
+              if (!ver.CouponList || ver.CouponList.length == 0) return  value = true;
+            break;
+
+          case '202':
+              if (!ver.CouponsList || ver.CouponsList.length == 0) return  value = true;
+            break;
+
+          case '203':
+              if (!ver.SelectDate) return  value = true;
+            break;
+
+          case '204':
+              if (!ver.NewMemStartYMD) return  value = true;
+              if (!ver.NewMemEndYMD) return  value = true;
+            break;
+
+          case '205':
+              if (!ver.NewMemSelectDate) return  value = true;
+            break;
+
+          case '206':
+              if (!ver.ProductList || ver.ProductList.length == 0) return  value = true;
+              if (!ver.IsMaxPay) return  value = true;
+              if (!ver.PayStartYMD) return  value = true;
+              if (!ver.PayEndYMD) return  value = true;
+            break;
+
+          case '207':
+              if (!ver.SelectDate) return  value = true;
+            break;
+
+          case '208':
+              if (!ver.SelectDate) return  value = true;
+            break;
+
+          case '209':
+              if (!ver.DateType) return  value = true;
+              if (!ver.SelectDate) return  value = true;
+              if (!ver.PayAmtStart) return  value = true;
+              if (!ver.PayAmtEnd) return  value = true;
+            break;
+
+          case '210':
+              if (!ver.ImportName) return  value = true;
+              if (!ver.ActivityType) return  value = true;
+            break;
+        }
+      })
+
+      return value;
     }
 
     /**
@@ -1655,6 +1759,7 @@ export default class EditJourneyView extends Vue {
     // }
     dropTrigger(e: any): void {
         this.allowDrop(e);
+        if (this.checkData()) return store.commit('setErrorMessage', '此節點無法連結')
         const dragText = e.dataTransfer.getData("Text");
 
         if (this.selectContent && (
@@ -1989,10 +2094,14 @@ export default class EditJourneyView extends Vue {
 
             case '發送時間':
                 if (this.dataTree.length == 1) {
+                    let type = this.journeyData.JourneyType == '01' || this.journeyData.JourneyType == '02' ? '0' :
+                    this.journeyData.JourneyType == '03' || this.journeyData.JourneyType == '07' || this.journeyData.JourneyType == '08' || this.journeyData.JourneyType == '09' ? '1' :
+                    this.journeyData.JourneyType == '04' || this.journeyData.JourneyType == '06' || this.journeyData.JourneyType == '10' ? '2' : '3'
                     this.dataTree.push({
                         NodeId: "2",
                         NodeName: dragText,
                         NodeType: "103",
+                        SendType: type,
                         Position: [
                             {
                                 "SeqId": "e2-3",
@@ -2006,29 +2115,35 @@ export default class EditJourneyView extends Vue {
                         NodeId: "2",
                         NodeName: dragText,
                         NodeType: "103",
+                        IsBestOffer: '0',
+                        SendType: type,
                         Position: [],
                     };
                     this.bottomDivView = true;
                     this.useId = ['2-3']
                     this.endId = 4
                     return;
-                } else if (this.useId.length > 0) {
+                } else if (this.useId.length > 0 && (this.journeyData.JourneyType != '03' && this.journeyData.JourneyType != '05' && this.journeyData.JourneyType != '07' && this.journeyData.JourneyType != '08' && this.journeyData.JourneyType != '09')) {
                     const uId = this.useId[0].split('-')[0].toString();
                     this.dataTree.forEach((ver: JourneyNodeModel) => {
                         if (ver.NodeId == uId) {
                             if (
-                                ver.NodeType == '102' || 
+                                (ver.NodeType == '102' || 
                                 ver.NodeType == '104' || 
                                 ver.NodeType == '106' || 
                                 ver.NodeType == '109' || 
                                 ver.NodeType == '110' || 
-                                ver.NodeType == '111'
+                                ver.NodeType == '111') && ver.NodeSeq && ver.NodeSeq?.split('-').length < 4
                             ) {
+                                let type = this.journeyData.JourneyType == '01' || this.journeyData.JourneyType == '02' ? '0' :
+                                this.journeyData.JourneyType == '03' || this.journeyData.JourneyType == '07' || this.journeyData.JourneyType == '08' || this.journeyData.JourneyType == '09' ? '1' :
+                                this.journeyData.JourneyType == '04' || this.journeyData.JourneyType == '06' || this.journeyData.JourneyType == '10' ? '2' : '3'
                                 // if (this.seqList.length > 0) this.seqList.splice(0, 1)
                                 this.dataTree.push({
                                     NodeId: this.useId[0].split('-')[1],
                                     NodeName: dragText,
                                     NodeType: "103",
+                                    SendType: type,
                                     Position: [
                                         {
                                             "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
@@ -2042,6 +2157,8 @@ export default class EditJourneyView extends Vue {
                                     NodeId: this.useId[0].split('-')[1],
                                     NodeName: dragText,
                                     NodeType: "103",
+                                    SendType: type,
+                                    IsBestOffer: '0',
                                     Position: [],
                                 };
                                 this.bottomDivView = true;
@@ -2075,11 +2192,16 @@ export default class EditJourneyView extends Vue {
                                 this.journeyData.JourneyType == '10' )
                                 && ver.NodeType == '103'
                             ) {
+                                let type = this.journeyData.JourneyType == '01' || this.journeyData.JourneyType == '02' ? '0' : this.journeyData.JourneyType == '03' ? '1' : this.journeyData.JourneyType == '06' ? '6' : this.journeyData.JourneyType == '09' ? '2' : this.journeyData.JourneyType == '04' ? '3' : ''
+                                if (this.journeyData.JourneyType == '10') {
+                                    type = this.importType == '0' ? '3' : this.importType == '1' ? '4' : '5'
+                                }
+
                                 this.dataTree.push({
                                     NodeId: this.useId[0].split('-')[1],
                                     NodeName: dragText,
                                     NodeType: "107",
-                                    JudgeType: '',
+                                    JudgeType: type,
                                     Position: [
                                         {
                                             "SeqId": "e" + this.useId[0].split('-')[1] + '-' + this.endId,
@@ -2099,6 +2221,7 @@ export default class EditJourneyView extends Vue {
                                     NodeId: this.useId[0].split('-')[1],
                                     NodeName: dragText,
                                     NodeType: "107",
+                                    JudgeType: type,
                                     Position: [],
                                 };
                                 this.bottomDivView = true;

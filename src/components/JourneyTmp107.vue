@@ -118,6 +118,38 @@ export default class JourneyTmp107 extends Vue {
                 }
             });
         }, 300)
+
+        if (!this.value.JudgeType) {
+            switch (this.dd.JourneyType) {
+                case '01':
+                case '02':
+                    this.value.JudgeType = '0';
+                    break;
+
+                case '03':
+                    this.value.JudgeType = '1';
+                    break;
+                    
+                case '09':
+                    this.value.JudgeType = '2';
+                    break;
+
+                case '04':
+                    this.value.JudgeType = '3';
+                    break;
+
+                case '06':
+                    this.value.JudgeType = '6';
+                    break;
+
+                case '10':
+                    this.value.JudgeType = this.type == '0' ? '3': this.type == '1' ? '4' : '5'
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
     
     changeDate(value: any): void {

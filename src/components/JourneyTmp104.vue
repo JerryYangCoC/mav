@@ -27,7 +27,7 @@
                     <span>參數上傳：</span>
                     <!-- <input type="text" style="width: 300px;" v-model="dd.JourneyName" required /> -->
                     <div style="display: flex;" v-if="dd.JourneyType == '01' || dd.JourneyType == '02' || dd.JourneyType == '06'">
-                        <input type="file" style="width: 300px;" @change="previewFiles($event, onFile)" accept=".csv" :disabled="isEdit" />
+                        <input id="inputFile" type="file" style="width: 300px;" @change="previewFiles($event, onFile)" accept=".csv" :disabled="isEdit" />
                         <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportFile" value="範例檔案" :disabled="isEdit" />
                     </div>
                 </div>
@@ -346,8 +346,10 @@ export default class JourneyTmp104 extends Vue {
                 break;
         }
 
+        store.dispatch('upLoading', true)
         axios.post('http://10.2.126.194:8030/app/v1/api/CDP/JourneyTempPeopleGet', data)
             .then((res) => {
+                store.dispatch('upLoading', false)
                 console.log('Journey Temp People', res)
                 if (res.status == 200) {
                     if (res.data?.Status == '0') {
@@ -357,6 +359,7 @@ export default class JourneyTmp104 extends Vue {
                     }
                 }
             }).catch((err) => {
+                store.dispatch('upLoading', false)
                 console.log(err)
             })
     }
@@ -381,6 +384,11 @@ export default class JourneyTmp104 extends Vue {
     }
 
     previewFiles(event: any, callbark: any): void {
+        if (event.target.files[0].type != 'text/csv') {
+            (document.getElementById('inputFile') as any).value = null
+            store.commit('setErrorMessage', '選擇檔案格式錯誤')
+            return;
+        }
         // console.log(this.value.ProductList)
         const fileReader = new FileReader();
         fileReader.readAsText(event.target.files[0]);

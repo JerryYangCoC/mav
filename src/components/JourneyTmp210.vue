@@ -1,10 +1,10 @@
 <template>
     <div>
         <form @submit.prevent="onClick()">
-            <div style="display: grid; grid-template-columns: 160px auto auto auto; align-items: center; justify-content: start; justify-items: end;">
+            <div style="display: grid; grid-template-columns: 160px auto auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>名單匯入：</span>
-                <input type="file" style="width: 300px;" @change="previewFiles($event, onFile)" accept=".csv" :required="gidList().length == 0" v-if="!isEdit" />
-                <input type="button" class="btn-white" style="--i: url('/img/more_horiz.svg'); width: 40px;" @click="queryView = true;" /> 
+                <input id="inputFile" type="file" style="width: 300px;" @change="previewFiles($event, upFile)" accept=".csv" v-if="!isEdit" />
+                <!-- <input type="button" class="btn-white" style="--i: url('/img/more_horiz.svg'); width: 40px;" @click="queryView = true;" />  -->
                 <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportFile" value="範例檔案" v-if="!isEdit" />
             </div>
 
@@ -28,19 +28,20 @@
                         
             <div style="display: flex; justify-content: flex-end;" v-if="isEdit">
                 <input type="button" class="btn" style="--i: url('/img/back.png')" @click="(() => {$router.push({path: 'journey', query: $router.currentRoute.value.query});})" value="返回" />
+                <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportGID()" value="匯出名單" />
                 <input type="button" class="btn" style="--i: url('/img/editor.png')" @click="edit" value="修改" :disabled="dd.SendFlag == '1'" />
             </div>
 
             <div style="display: flex; justify-content: flex-end;" v-else>
                 <input type="button" class="btn" style="--i: url('/img/delete.png')" @click="onRemove()" value="刪除" v-if="remove" />
-                <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportGID()" value="匯出名單" v-if="isEdit == false" />
+                <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportGID()" value="匯出名單" :disabled="value.ImportName == undefined" />
 
                 <input type="submit" class="btn" style="--i: url('/img/sent.png')" value="確認" />
             </div>
         </form>
     </div>
 
-    <Dialog v-model:visible="queryView" modal :show-header="false" :style="{ width: '50vw' }">
+    <!-- <Dialog v-model:visible="queryView" modal :show-header="false" :style="{ width: '50vw' }">
         <div class="box-copy" style="margin-top: 20px;">
             <DataTable
                 :value="gidList()"
@@ -49,11 +50,33 @@
                 <Column field="GID" header="編號"></Column>
             </DataTable>
 
+            <div class="p-datatable p-component p-datatable-responsive-scroll">
+                <table class="p-datatable-table" style="min-width: 20rem; border: 1px solid rgb(204, 204, 204);">
+                    <thead class="p-datatable-thead">
+                        <tr>
+                            <th>
+                                <div class="p-column-header-content">
+                                    <span class="p-column-title">編號</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody class="p-datatable-tbody">
+                        <tr v-for="(item, index) in gidList()" v-bind:key="index">
+                            <td>
+                                {{ item.GID }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
             <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-                <input type="button" class="btn" style="--i: url('img/back.png')" @click="queryView = false;" value="返回" />
+                <input type="button" class="btn" style="--i: url('/img/back.png')" @click="queryView = false;" value="返回" />
             </div>
         </div>
-    </Dialog>
+    </Dialog> -->
 
 
     <Dialog v-model:visible="queryActivityView" modal :show-header="false" :style="{ width: '60vw' }">
@@ -93,6 +116,7 @@ import { Options, Vue } from 'vue-class-component';
 import { ImportModel, JourneyModel, JourneyNodeModel } from '@/model/journeyList.model';
 import * as XLSX from 'xlsx';
 import store from '@/store';
+import axios from 'axios';
 
 /**
  * 名單匯入
@@ -139,11 +163,7 @@ export default class JourneyTmp210 extends Vue {
             this.value.ActivityList = [{
                 ActivityNo: this.selectActivity.CopCode,
                 ActivityNm: this.selectActivity.CopDesc
-            }];
-            // this.value.ActivityList?.push({
-            //     ActivityNo: this.selectActivity.CopCode,
-            //     ActivityNm: this.selectActivity.CopDesc
-            // })
+            }]
         }
 
 
@@ -155,12 +175,23 @@ export default class JourneyTmp210 extends Vue {
     }
 
     previewFiles(event: any, callbark: any): void {
+      console.log(event.target.files[0])
+        if (event.target.files[0].type != 'text/csv') {
+            (document.getElementById('inputFile') as any).value = null
+            store.commit('setErrorMessage', '選擇檔案格式錯誤')
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('FileUpload', event.target.files[0], event.target.files[0].name)
+        console.log(formData)
+        callbark(formData)
         // console.log(this.value.ProductList)
-        const fileReader = new FileReader();
-        fileReader.readAsText(event.target.files[0]);
-        fileReader.onload = function() {
-            callbark(this.result)
-        };
+        // const fileReader = new FileReader();
+        // fileReader.readAsText(event.target.files[0]);
+        // fileReader.onload = function() {
+        //     callbark(this.result)
+        // };
     }
 
     onExportFile(): void {
@@ -196,14 +227,36 @@ export default class JourneyTmp210 extends Vue {
         this.value.Import = this.value.Import?.filter((v: any) => v != null)
     }
 
+    upFile(data: any): void {
+      store.dispatch('upLoading', true)
+      axios.post('http://10.2.126.194:8030/app/v1/api/CDP/UploadImport', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then((res) => {
+          store.dispatch('upLoading', false)
+          console.log(res)
+          if (res.status == 200) {
+            if (res.data?.Status == '0') {
+              this.value.ImportName = res.data.FileName
+            } else {
+              store.commit('setErrorMessage', res.data?.Message)
+            }
+          }
+        }).catch((err) => {
+          store.dispatch('upLoading', false)
+          console.log(err)
+        })
+    }
+
     onSearch(): void {
         this.query.Type = this.value.ActivityType ?? '';
         store.dispatch('getListJourneyActivity', this.query)
     }
 
-    gidList(): ImportModel[] {
-        return this.value.Import ?? []
-    }
+    // gidList(): ImportModel[] {
+    //     return this.value.Import ?? []
+    // }
 
     copyList(): any {
         return store.state.journey.journeyActivityList;
@@ -211,7 +264,7 @@ export default class JourneyTmp210 extends Vue {
 
     onExportGID(): void {
         store.dispatch('upLoading', true)
-        store.dispatch('getJourneyCheckGID', this.value.Import)
+        store.dispatch('getJourneyCheckGID', this.value.ImportName)
     }
 }
 </script>

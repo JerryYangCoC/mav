@@ -15,7 +15,7 @@
 
                 <div style="display: grid; grid-template-columns: 90px auto; place-items: center end; justify-content: start;">
                     <span><span class="ask-red">*</span>旅程型態：</span>
-                    <select style="min-width: 185px;" v-model="copyData.JourneyType" @change="changeParam()" required>
+                    <select style="min-width: 185px;" v-model="copyData.JourneyType" @change="copyData.ParamType = ''; changeParam()" required>
                         <option value="01">01：回券-POS COUPON</option>
                         <option value="02">02：回券-精算抵用券</option>
                         <option value="03">03：生日</option>
@@ -63,8 +63,8 @@
                     <span><span class="ask-red">*</span>參數型態：</span>
                     <select v-model="copyData.ParamType" :disabled="copyParamType" @change="changeParam()">
                         <option value="00">00：無</option>
-                        <option value="01">01：預定義</option>
-                        <option value="02">02：自定義</option>
+                        <option value="01" v-if="copyData.JourneyType && copyData.JourneyType != '04' && copyData.JourneyType != '05' && copyData.JourneyType != '09' && copyData.JourneyType != '10'">01：預定義</option>
+                        <option value="02" v-if="copyData.JourneyType == '01' || copyData.JourneyType == '02' || copyData.JourneyType == '06'">02：自定義</option>
                     </select>
                 </div>
             </div>
@@ -567,7 +567,7 @@ export default class AddCopyView extends Vue {
      * 根據旅程型態鍵入文案參數
      */
     changeParam(): void {
-        if (this.copyData.ParamType == '02') return;
+        // if (this.copyData.ParamType == '02') return;
 
         this.copyData.Param1 = ''
         this.copyData.Param2 = ''

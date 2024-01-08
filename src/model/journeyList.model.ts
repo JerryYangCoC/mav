@@ -229,6 +229,11 @@ export interface JourneyNodeModel {
     Import?: Array<ImportModel>,
 
     /**
+     * 名單匯入檔名
+     */
+    ImportName?: string,
+
+    /**
      * 活動來源
      */
     ActivityType?: string,

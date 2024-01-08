@@ -3,7 +3,7 @@
         <form @submit.prevent="onClick()">
             <div style="display: grid; grid-template-columns: 160px auto auto auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>商品：</span>
-                <input type="file" style="width: 300px;" @change="previewFiles($event, onFile)" accept=".csv" required v-if="!isEdit" />
+                <input id="inputFile" type="file" style="width: 300px;" @change="previewFiles($event, onFile)" accept=".csv" :required="copList().length == 0" v-if="!isEdit" />
                 <input type="button" class="btn-white" style="--i: url('/img/more_horiz.svg'); width: 40px;" @click="queryView = true;" /> 
                 <input type="button" class="btn" style="--i: url('/img/export.png'); width: 100px;" @click="onExportFile" value="範例檔案" v-if="!isEdit" />
             </div>
@@ -43,7 +43,7 @@
 
     <Dialog v-model:visible="queryView" modal :show-header="false" :style="{ width: '50vw' }">
         <div class="box-copy" style="margin-top: 20px;">
-            <DataTable :value="copList()" tableStyle="min-width: 20rem; border: 1px solid #ccc;" v-if="copList()">
+            <DataTable :value="copList()" tableStyle="min-width: 20rem; border: 1px solid #ccc;" v-if="copList().length > 0">
                 <Column field="ItemCode" header="品號"></Column>
                 <Column field="ItemInvNM" header="名稱"></Column>
             </DataTable>
@@ -145,6 +145,11 @@ export default class JourneyTmp206 extends Vue {
     }
 
     previewFiles(event: any, callbark: any): void {
+        if (event.target.files[0].type != 'text/csv') {
+            (document.getElementById('inputFile') as any).value = null
+            store.commit('setErrorMessage', '選擇檔案格式錯誤')
+            return;
+        }
         // console.log(this.value.ProductList)
         const fileReader = new FileReader();
         fileReader.readAsText(event.target.files[0]);
@@ -183,6 +188,8 @@ export default class JourneyTmp206 extends Vue {
                     itemName: v.ItemInvNM,
                 }
             })
+
+            store.commit('setJourneyGetSingleItem', new Array<ProductModel>())
         }
         this.active();
     }
@@ -202,10 +209,17 @@ export default class JourneyTmp206 extends Vue {
         });
         itemList = itemList.filter((v: any) => v != null)
 
+        if (itemList.length > 100) {
+            (document.getElementById('inputFile') as any).value = null
+            store.commit('setErrorMessage', '上傳商品數量已超過上限，旅程上限值為100件商品')
+            return;
+        }
+
         store.dispatch('getJourneyGetSingleItem', {itemList})
     }
 
     copList(): any {
+        console.log(store.state.journey.journeySingleItemList)
         return store.state.journey.journeySingleItemList
     }
 }

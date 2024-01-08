@@ -101,6 +101,34 @@ export default class JourneyTmp103 extends Vue {
                 }
             });
         }, 300)
+
+        if (!this.value.SendType) {
+            switch(this.dd.JourneyType) {
+                case '01':
+                case '02':
+                    this.value.SendType = '0';
+                    break;
+
+                case '03':
+                case '07':
+                case '08':
+                    this.value.SendType = '1';
+                    break;
+
+                case '04':
+                case '06':
+                case '10':
+                    this.value.SendType = '2';
+                    break;
+
+                case '05':
+                    this.value.SendType = '3';
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
     }
 
     onClick(): void {
@@ -153,7 +181,7 @@ export default class JourneyTmp103 extends Vue {
 
     onStartYMD(): void {
         setTimeout(() => {
-            this.value.SelectTime = (window.document.getElementById('StartYMD') as any).value
+            this.value.SelectTime = (document.getElementById('StartYMD') as any).value
             // $( "#StartYMD" ).datepicker( "hide" );
         }, 150)
     }

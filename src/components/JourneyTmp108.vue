@@ -21,6 +21,7 @@
             
             <div style="display: flex; justify-content: flex-end;" v-if="isEdit">
                 <input type="button" class="btn" style="--i: url('/img/back.png')" @click="(() => {$router.push({path: 'journey', query: $router.currentRoute.value.query});})" value="返回" />
+                <input type="button" class="btn" style="--i: url('/img/editor.png')" @click="edit" value="修改" :disabled="dd.SendFlag == '1'" />
             </div>
 
             <div style="display: flex; justify-content: flex-end;" v-else>
@@ -46,12 +47,14 @@ import { JourneyModel, JourneyNodeModel } from '@/model/journeyList.model';
     active: null,
     remove: null,
     isEdit: null,
+    edit: null,
   }
 })
 export default class JourneyTmp108 extends Vue {
     dd!: JourneyModel;
     value!: JourneyNodeModel;
     active!: () => void;
+    edit!: () => void;
     remove!: () => void;
     prm1!: boolean;
     prm2!: boolean;

@@ -329,7 +329,8 @@ export const moduleJourney = {
             //         console.log(err)
             //         context.commit('setLoading', false)
             //     })
-            axios.post("http://10.2.126.194:8030/app/v1/api/CDP/JourneyCheckGID", { GID_List: data }, { responseType: 'blob' })
+            // axios.post("http://10.2.126.194:8030/app/v1/api/CDP/JourneyCheckGID", { GID_List: data }, { responseType: 'blob' })
+            axios.post("http://10.2.126.194:8030/app/v1/api/CDP/JourneyGetImport", { JourneyId: data }, { responseType: 'blob' })
                 .then((res: any) => {
                     console.log(res)
                     if (res.status == 200) {
@@ -337,14 +338,14 @@ export const moduleJourney = {
                             (window.navigator as any).msSaveOrOpenBlob(new Blob([res.data],
                                     { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
                                 ),
-                                'GID匯出檔案.csv'
+                                data
                             );
                         } else {
                             const url = window.URL.createObjectURL(new Blob([res.data],
                                 { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
                             const link = document.createElement('a');
                             link.href = url;
-                            link.setAttribute('download', 'GID匯出檔案.csv');
+                            link.setAttribute('download', data);
                             document.body.appendChild(link);
                             link.click();
                         }
