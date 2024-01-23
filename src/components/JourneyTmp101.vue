@@ -116,15 +116,13 @@ export default class JourneyTmp101 extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.dd.StartDate = (document.getElementById('StartYMD') as any).value;
-            // $( "#StartYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
-            this.dd.EndDate = (document.getElementById('EndYMD') as any).value
-            // $( "#EndYMD" ).datepicker( "hide" );
-        }, 150)
+            this.dd.EndDate = (document.getElementById('EndYMD') as any).value;
+        }, 300)
     }
 }
 </script>

@@ -247,7 +247,7 @@ export default class JourneyTmp106 extends Vue {
             IsMaxPay: null,
             PayStartYMD: null,
             PayEndYMD: null,
-            Import: null,
+            ImportName: null,
             ActivityType: null,
             ActivityList: null,
             DateType: null,
@@ -346,7 +346,7 @@ export default class JourneyTmp106 extends Vue {
                 break;
 
             case '10':
-                data.Import = this.dd.Content[0].Import
+                data.ImportName = this.dd.Content[0].ImportName
                 data.ActivityType = this.dd.Content[0].ActivityType
                 data.ActivityList = this.dd.Content[0].ActivityList
                 break;

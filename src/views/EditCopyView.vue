@@ -197,9 +197,9 @@
                 <input type="button" class="btn" style="--i: url('/img/create.png')" @click="(() => {isEdit = true})" value="修改" />
             </div>
             
-            <div style="padding: 12px 6px;" v-if="!isEdit">
+            <!-- <div style="padding: 12px 6px;" v-if="!isEdit">
                 <input type="button" class="btn" style="--i: url('/img/clear.png')" @click="onDel()" value="刪除" />
-            </div>
+            </div> -->
 
             <div style="padding: 12px 6px;">
                 <input type="button" class="btn" style="--i: url('/img/redo.png')" @click="onToList()" value="返回" />
@@ -380,14 +380,14 @@ export default class EditCopyView extends Vue {
         setTimeout(() => {
             this.copyData.StartYMD = (window.document.getElementById('StartYMD') as any).value
             // $( "#StartYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.copyData.EndYMD = (window.document.getElementById('EndYMD') as any).value
             // $( "#EndYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     /**

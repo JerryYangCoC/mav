@@ -76,14 +76,14 @@ export default class JourneyTmp204 extends Vue {
         setTimeout(() => {
             this.value.NewMemStartYMD = (window.document.getElementById('StartYMD') as any).value
             // $( "#StartYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.value.NewMemEndYMD = (window.document.getElementById('EndYMD') as any).value
             // $( "#EndYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     changeDate(value: any): void {

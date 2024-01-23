@@ -109,8 +109,7 @@
                         
                                 <button
                                     style="width: 54px;"
-                                    :class="slotProps.node.data.SendFlag == '0' ? 'btn-red' : ''"
-                                    :disabled="slotProps.node.data.SendFlag != '0'"
+                                    class="btn-red"
                                     @click="onRemove(slotProps.node.data)">刪除</button>
 
                             </div>
@@ -398,15 +397,13 @@ export default class JourneyView extends Vue {
     onStartYMD(): void {
         setTimeout(() => {
             this.query.StartDate = (window.document.getElementById('StartYMD') as any).value
-            // $( "#StartYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.query.EndDate = (window.document.getElementById('EndYMD') as any).value
-            // $( "#EndYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     /**

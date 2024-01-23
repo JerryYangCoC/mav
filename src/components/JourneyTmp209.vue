@@ -99,7 +99,7 @@ export default class JourneyTmp209 extends Vue {
         setTimeout(() => {
             this.value.SelectDate = (window.document.getElementById('YMD') as any).value
             // $( "#YMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     changeDate(value: any): void {

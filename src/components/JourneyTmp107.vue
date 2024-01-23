@@ -191,28 +191,28 @@ export default class JourneyTmp107 extends Vue {
         setTimeout(() => {
             this.value.ConsumeStartYMD = (window.document.getElementById('StartYMD') as any).value
             // $( "#StartYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.value.ConsumeEndYMD = (window.document.getElementById('EndYMD') as any).value
             // $( "#EndYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     onRStartYMD(): void {
         setTimeout(() => {
             this.value.RemindedStartYMD = (window.document.getElementById('RStartYMD') as any).value
             // $( "#RStartYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     onREndYMD(): void {
         setTimeout(() => {
             this.value.RemindedEndYMD = (window.document.getElementById('REndYMD') as any).value
             // $( "#REndYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     changeJudgeType(value: any): void {

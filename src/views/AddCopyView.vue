@@ -528,14 +528,14 @@ export default class AddCopyView extends Vue {
         setTimeout(() => {
             this.copyData.StartYMD = (window.document.getElementById('StartYMD') as any).value
             // $( "#StartYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     onEndYMD(): void {
         setTimeout(() => {
             this.copyData.EndYMD = (window.document.getElementById('EndYMD') as any).value
             // $( "#EndYMD" ).datepicker( "hide" );
-        }, 150)
+        }, 300)
     }
 
     /**

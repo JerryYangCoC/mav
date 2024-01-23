@@ -104,12 +104,19 @@
               <Column field="message" header="文案內容"></Column>
               <Column field="StartYMD" header="有效起日"></Column>
               <Column field="EndYMD" header="有效訖日"></Column>
-              <Column header="功能" style="width: 90px;">
+              <Column header="功能" style="width: 140px;">
                 <template #body="slotProps">
+                  <div style="display: flex; justify-content: space-between;">
                     <button
                       style="width: 54px;"
                       class="btn-blue"
                       @click="onDetail(slotProps.node.data.CopyWriteID)">瀏覽</button>
+
+                    <button
+                      style="width: 54px;"
+                      class="btn-red"
+                      @click="onRemove(slotProps.node.data)">刪除</button>
+                  </div>
                 </template>
               </Column>
           </TreeTable>
@@ -117,6 +124,7 @@
 
       </div>
     </div>
+    <ConfirmDialog :closable="false"></ConfirmDialog>
 </template>
 
 <script lang="ts">
@@ -130,6 +138,7 @@ import { CopyListModel, CopyModel } from '@/model/copyList.model';
 import moment from 'moment';
 import * as XLSX from 'xlsx';
 import $ from 'jquery';
+import { useConfirm } from 'primevue/useconfirm';
 
 @Options({
   components: {
@@ -148,6 +157,7 @@ export default class CopyView extends Vue {
     EndYMD: '',
     message: ''
   };
+  confirm = useConfirm();
 
   /**
    * 初始化
@@ -198,19 +208,19 @@ export default class CopyView extends Vue {
     return value.replace(/\//g, '-')
   }
 
-    onStartYMD(): void {
-        setTimeout(() => {
-            this.query.StartYMD = (window.document.getElementById('StartYMD') as any).value
-            // $( "#StartYMD" ).datepicker( "hide" );
-        }, 150)
-    }
+  onStartYMD(): void {
+    setTimeout(() => {
+      this.query.StartYMD = (window.document.getElementById('StartYMD') as any).value
+      // $( "#StartYMD" ).datepicker( "hide" );
+    }, 300)
+  }
 
-    onEndYMD(): void {
-        setTimeout(() => {
-            this.query.EndYMD = (window.document.getElementById('EndYMD') as any).value
-            // $( "#EndYMD" ).datepicker( "hide" );
-        }, 150)
-    }
+  onEndYMD(): void {
+    setTimeout(() => {
+      this.query.EndYMD = (window.document.getElementById('EndYMD') as any).value
+      // $( "#EndYMD" ).datepicker( "hide" );
+    }, 300)
+  }
 
   /**
    * 查詢
@@ -226,6 +236,20 @@ export default class CopyView extends Vue {
    */
   onDetail(id: string): void {
     store.dispatch('getDetailCopy', id)
+  }
+
+  onRemove(value: CopyModel): void {
+    this.confirm.require({
+      message: '請確認是否「刪除」！',
+      header: '確認',
+      acceptClass: 'p-button-danger',
+      acceptLabel: '取消',
+      rejectLabel: '確認',
+      reject: () => {
+        value.FileType = '3'
+        store.dispatch('setCopy', value)
+      }
+    });
   }
 
   /**

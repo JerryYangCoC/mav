@@ -11,7 +11,7 @@
             <div style="display: grid; grid-template-columns: 160px auto; align-items: center; justify-content: start; justify-items: end;">
                 <span><span class="ask-red">*</span>活動來源：</span>
                 <div style="display: flex;">
-                    <select v-model="value.ActivityType" required :disabled="isEdit" @change="selectActivity = {CopCode: '', CopDesc: ''}">
+                    <select v-model="value.ActivityType" required :disabled="isEdit" @change="selectActivity = {CopCode: '', CopDesc: '', MmNo: ''}">
                         <option value="0">全店</option>
                         <option value="1">3G活動</option>
                         <option value="2">精算活動</option>
@@ -19,6 +19,7 @@
 
                     <div v-if="value.ActivityType == '1' || value.ActivityType == '2'" style="display: flex;">
                         <input type="text" :value="selectActivity.CopCode" style="width: 100px;" disabled >
+                        <input type="text" :value="selectActivity.MmNo" style="width: 75px;" v-if="value.ActivityType == '1'" disabled >
                         <input type="text" :value="selectActivity.CopDesc" style="width: 200px;" disabled >
                         <input type="button" class="btn-white" style="--i: url('/img/more_horiz.svg'); width: 40px;" @click="queryActivityView = true; onSearch();" :disabled="isEdit" /> 
 
@@ -83,6 +84,7 @@
         <div class="box-copy">
             <div style="text-align: center; display: flex;">
                 <input type="text" style="width: 200px;" v-model="query.ActionID" placeholder="編號" />
+                <input type="text" style="width: 200px;" maxlength="4" v-model="query.MmNo" placeholder="小四碼" v-if="value.ActivityType == '1'" />
                 <input type="text" style="width: 200px;" v-model="query.ActionName" placeholder="名稱" />
                 <!-- <input type="button" class="btn-def" @click="onSearch()" value="搜尋" />
                 <input type="button" class="btn-def" @click="queryActivityView = false;" value="返回" /> -->
@@ -105,6 +107,7 @@
                     </template>
                 </Column>
                 <Column field="CopCode" header="編號"></Column>
+                <Column field="MmNo" header="小四碼" v-if="value.ActivityType == '1'"></Column>
                 <Column field="CopDesc" header="名稱"></Column>
             </TreeTable>
         </div>
@@ -141,12 +144,14 @@ export default class JourneyTmp210 extends Vue {
     queryActivityView = false;
     selectActivity = {
         CopCode: '',
-        CopDesc: ''
+        CopDesc: '',
+        MmNo: ''
     }
     query = {
         Type: '',
         ActionID: '',
-        ActionName: ''
+        ActionName: '',
+        MmNo: ''
     }
     isEdit!: boolean;
 
@@ -154,6 +159,7 @@ export default class JourneyTmp210 extends Vue {
         if (this.value.ActivityList && this.value.ActivityList.length > 0) {
             this.selectActivity.CopCode = this.value.ActivityList[0].ActivityNo
             this.selectActivity.CopDesc = this.value.ActivityList[0].ActivityNm
+            this.selectActivity.MmNo = this.value.ActivityList[0].MmNo ?? ''
         }
     }
 
@@ -162,7 +168,8 @@ export default class JourneyTmp210 extends Vue {
             if (!this.selectActivity.CopCode) return;
             this.value.ActivityList = [{
                 ActivityNo: this.selectActivity.CopCode,
-                ActivityNm: this.selectActivity.CopDesc
+                ActivityNm: this.selectActivity.CopDesc,
+                MmNo: this.selectActivity.MmNo,
             }]
         }
 

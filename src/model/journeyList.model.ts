@@ -309,6 +309,11 @@ export interface CouponModel {
      * Coupon名稱
      */
     CouponName?: string,
+
+    /**
+     * 小四碼
+     */
+    MmNo?: string,
 }
 
 /**
@@ -422,6 +427,11 @@ export interface ActivityModel {
      * 活動名稱
      */
     ActivityNm: string,
+
+    /**
+     * 小四碼
+     */
+    MmNo?: string,
 }
 
 /**

@@ -330,7 +330,7 @@ export const moduleJourney = {
             //         context.commit('setLoading', false)
             //     })
             // axios.post("http://10.2.126.194:8030/app/v1/api/CDP/JourneyCheckGID", { GID_List: data }, { responseType: 'blob' })
-            axios.post("http://10.2.126.194:8030/app/v1/api/CDP/JourneyGetImport", { JourneyId: data }, { responseType: 'blob' })
+            axios.post("http://10.2.126.194:8030/app/v1/api/CDP/JourneyGetImport", { ImportName: data }, { responseType: 'blob' })
                 .then((res: any) => {
                     console.log(res)
                     if (res.status == 200) {
